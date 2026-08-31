@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="840" viewBox="0 0 1400 840" role="img" aria-labelledby="title desc">
+  <title id="title">End-to-end SONiC and direct SAI test boundaries</title>
+  <desc id="desc">The upper path shows PTF traffic through normal SONiC orchagent, syncd, SAI, and ASIC. The lower path shows PTF SAI thrift calls directly to saiserver and vendor SAI, bypassing normal orchestration, with a compatibility matrix and restoration requirement.</desc>
+  <defs><marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#475569"/></marker>
+    <style>.h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 18px system-ui,sans-serif;fill:#0f172a}.b{font:14px system-ui,sans-serif;fill:#334155}.s{font:12px system-ui,sans-serif;fill:#475569}.p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:16}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:10}.green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:10}.purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:10}.orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:10}.red{fill:#fee2e2;stroke:#dc2626;stroke-width:2;rx:10}.line{stroke:#475569;stroke-width:2.3;fill:none;marker-end:url(#a)}.skip{stroke:#dc2626;stroke-width:3;stroke-dasharray:8 6;fill:none}</style>
+  </defs>
+  <rect width="1400" height="840" fill="#fff"/><text x="55" y="52" class="h1">PTF can test through SONiC or drive SAI directly</text><text x="55" y="80" class="b">The direct qualification path intentionally bypasses normal SONiC orchestration.</text>
+  <rect x="45" y="115" width="1310" height="245" class="green"/><text x="70" y="150" class="h2">End-to-end SONiC feature test</text>
+  <rect x="80" y="195" width="190" height="85" class="blue"/><text x="175" y="226" text-anchor="middle" class="b">pytest + PTF</text><text x="175" y="252" text-anchor="middle" class="s">packet behavior</text>
+  <rect x="325" y="195" width="190" height="85" class="green"/><text x="420" y="226" text-anchor="middle" class="b">SONiC ports/DB</text><text x="420" y="252" text-anchor="middle" class="s">feature state</text>
+  <rect x="570" y="195" width="190" height="85" class="green"/><text x="665" y="226" text-anchor="middle" class="b">orchagent</text><text x="665" y="252" text-anchor="middle" class="s">normal orchestration</text>
+  <rect x="815" y="195" width="190" height="85" class="green"/><text x="910" y="226" text-anchor="middle" class="b">syncd + SAI</text><text x="910" y="252" text-anchor="middle" class="s">vendor interface</text>
+  <rect x="1060" y="195" width="235" height="85" class="orange"/><text x="1177" y="226" text-anchor="middle" class="b">ASIC dataplane</text><text x="1177" y="252" text-anchor="middle" class="s">end-to-end result</text>
+  <path d="M270 237H315" class="line"/><path d="M515 237H560" class="line"/><path d="M760 237H805" class="line"/><path d="M1005 237H1050" class="line"/>
+
+  <rect x="45" y="400" width="1310" height="245" class="purple"/><text x="70" y="435" class="h2">Direct SAI qualification</text>
+  <rect x="80" y="480" width="235" height="90" class="blue"/><text x="197" y="511" text-anchor="middle" class="b">PTF-SAI test/client</text><text x="197" y="537" text-anchor="middle" class="s">thrift API calls + packets</text>
+  <rect x="390" y="480" width="235" height="90" class="purple"/><text x="507" y="511" text-anchor="middle" class="b">RPC transport</text><text x="507" y="537" text-anchor="middle" class="s">example TCP 9092</text>
+  <rect x="700" y="480" width="235" height="90" class="orange"/><text x="817" y="511" text-anchor="middle" class="b">saiserverv2</text><text x="817" y="537" text-anchor="middle" class="s">normal swss/syncd stopped</text>
+  <rect x="1010" y="480" width="285" height="90" class="orange"/><text x="1152" y="511" text-anchor="middle" class="b">vendor SAI + ASIC</text><text x="1152" y="537" text-anchor="middle" class="s">qualification boundary</text>
+  <path d="M315 525H380" class="line"/><path d="M625 525H690" class="line"/><path d="M935 525H1000" class="line"/>
+  <path d="M665 460V590" class="skip"/><text x="665" y="618" text-anchor="middle" class="s">bypasses normal SONiC orchestration</text>
+
+  <rect x="45" y="690" width="1310" height="105" class="red"/><text x="70" y="723" class="h2">Compatibility and restoration are part of the result</text>
+  <text x="75" y="758" class="b">SAI headers + PTF-SAI revision + thrift client + saiserver image + SONiC/vendor SDK must match</text>
+  <text x="75" y="783" class="s">After qualification: stop saiserver → restore syncd/swss → verify services, ports, and a normal SONiC packet path.</text>
+</svg>

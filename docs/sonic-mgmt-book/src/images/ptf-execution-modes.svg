@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">PTF adapter and PTF runner modes</title>
+  <desc id="desc">Two parallel packet execution paths: local pytest packet control through a persistent PTF agent, and a remotely launched self-contained PTF test, both using the same PTF dataplane interfaces to reach the DUT.</desc>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#475569"/></marker>
+    <style>
+      .h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 19px system-ui,sans-serif;fill:#0f172a}
+      .b{font:15px system-ui,sans-serif;fill:#334155}.s{font:13px system-ui,sans-serif;fill:#475569}
+      .p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:16}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:12}
+      .green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:12}.purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:12}
+      .orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:12}.line{stroke:#475569;stroke-width:2.3;fill:none;marker-end:url(#a)}
+      .bi{stroke:#475569;stroke-width:2.3;fill:none;marker-start:url(#a);marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1400" height="820" fill="#fff"/>
+  <text x="55" y="52" class="h1">Two PTF control modes, one deployed dataplane</text>
+  <text x="55" y="80" class="b">The process and artifact boundaries differ even when both modes send through PTF ethN.</text>
+
+  <rect x="45" y="115" width="635" height="470" class="p"/>
+  <text x="70" y="151" class="h2">Mode A · ptfadapter</text>
+  <rect x="80" y="185" width="250" height="125" class="blue"/>
+  <text x="205" y="216" text-anchor="middle" class="h2">pytest process</text>
+  <text x="205" y="246" text-anchor="middle" class="b">build packet + Mask</text>
+  <text x="205" y="272" text-anchor="middle" class="b">send / poll / verify</text>
+  <text x="205" y="296" text-anchor="middle" class="s">feature logic stays local</text>
+  <rect x="395" y="185" width="250" height="125" class="purple"/>
+  <text x="520" y="216" text-anchor="middle" class="h2">ptf_nn_agent</text>
+  <text x="520" y="246" text-anchor="middle" class="b">persistent process</text>
+  <text x="520" y="272" text-anchor="middle" class="b">nanomsg/TCP control</text>
+  <text x="520" y="296" text-anchor="middle" class="s">module-scoped adapter</text>
+  <path d="M330 247H385" class="bi"/>
+  <rect x="230" y="365" width="270" height="95" class="green"/>
+  <text x="365" y="396" text-anchor="middle" class="h2">PTF dataplane</text>
+  <text x="365" y="424" text-anchor="middle" class="b">ethN · send · capture</text>
+  <text x="365" y="448" text-anchor="middle" class="s">shared for the module</text>
+  <path d="M520 310V347H365V355" class="line"/>
+  <text x="80" y="515" class="b">Best for:</text><text x="155" y="515" class="s">short packet checks interleaved with DUT state</text>
+  <text x="80" y="545" class="b">Evidence:</text><text x="155" y="545" class="s">pytest + agent logs, polls and captures</text>
+
+  <rect x="720" y="115" width="635" height="470" class="p"/>
+  <text x="745" y="151" class="h2">Mode B · ptf_runner</text>
+  <rect x="755" y="185" width="250" height="125" class="blue"/>
+  <text x="880" y="216" text-anchor="middle" class="h2">pytest process</text>
+  <text x="880" y="246" text-anchor="middle" class="b">choose test + params</text>
+  <text x="880" y="272" text-anchor="middle" class="b">remote shell command</text>
+  <text x="880" y="296" text-anchor="middle" class="s">environment orchestration</text>
+  <rect x="1070" y="185" width="250" height="125" class="purple"/>
+  <text x="1195" y="216" text-anchor="middle" class="h2">PTF test process</text>
+  <text x="1195" y="246" text-anchor="middle" class="b">test class + algorithm</text>
+  <text x="1195" y="272" text-anchor="middle" class="b">packet send / verify</text>
+  <text x="1195" y="296" text-anchor="middle" class="s">one remote invocation</text>
+  <path d="M1005 247H1060" class="line"/>
+  <rect x="905" y="365" width="270" height="95" class="green"/>
+  <text x="1040" y="396" text-anchor="middle" class="h2">PTF dataplane</text>
+  <text x="1040" y="424" text-anchor="middle" class="b">ethN · send · capture</text>
+  <text x="1040" y="448" text-anchor="middle" class="s">owned by remote test</text>
+  <path d="M1195 310V347H1040V355" class="line"/>
+  <text x="755" y="515" class="b">Best for:</text><text x="830" y="515" class="s">self-contained established PTF algorithms</text>
+  <text x="755" y="545" class="b">Evidence:</text><text x="830" y="545" class="s">process result, fetched PTF log and pcap</text>
+
+  <rect x="45" y="620" width="1310" height="145" class="green"/>
+  <text x="70" y="655" class="h2">Shared dataplane realization</text>
+  <text x="85" y="696" class="b">PTF ethN</text><text x="190" y="696" class="s">→ namespace / veth / OVS or direct VLAN → server NIC trunk → fanout path → DUT interface</text>
+  <text x="85" y="731" class="b">Mapping</text><text x="190" y="731" class="s">topology + live minigraph facts + PTF-host ownership; never infer from Ethernet numeric suffix</text>
+  <path d="M365 460V610" class="line"/><path d="M1040 460V610" class="line"/>
+</svg>

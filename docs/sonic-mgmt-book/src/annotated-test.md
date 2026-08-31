@@ -1,64 +1,155 @@
 # End-to-end annotated test
 
-This chapter traces one current test:
-`tests/arp/test_arpall.py::test_arp_unicast_reply`. It is a useful teaching
-example because pytest prepares the DUT, launches a remote PTF test, then
-checks DUT state.
+This chapter follows the current
+`tests/arp/test_arpall.py::test_arp_unicast_reply` path. It is useful because
+the short test body depends on collection markers, DUT/ASIC selection,
+module-scoped remote mutations, PTF file deployment, a remote PTF test, DUT
+state verification, and two layers of cleanup.
 
-## 1. Collection and selection
+![End-to-end flow of the ARP unicast reply test](images/annotated-arp-flow.svg)
 
-The module declares:
+This is a reading exercise, not a claim that ARP is the canonical style for
+every new test. Always inspect the version in the branch under test.
 
-```python
-pytestmark = [pytest.mark.topology("t1", "t2", "lrh", "urh", "m1", "c0")]
-```
+## Source trail
 
-The topology plugin compares this declaration with the selected testbed. A
-`t0` run is skipped before the function body. Conditional-mark rules can add
-another skip or xfail based on DUT facts.
+| Source | Role |
+|---|---|
+| `tests/arp/test_arpall.py` | Test marker, test body, remote PTF call, ARP-table assertions |
+| `tests/arp/conftest.py` | Interface selection, topology-specific mutations, polling interval, setup and restoration |
+| `tests/arp/arp_utils.py` | ARP cache and diagnostic helpers |
+| `tests/ptf_runner.py` | Remote PTF process and artifact handling |
+| `ansible/roles/test/files/ptftests/py3/arptest.py` | PTF packet algorithm |
+| `tests/conftest.py` and shared plugins | DUT/ASIC parameterization, sanity, log analysis, reporting |
 
-The `enum_frontend_asic_index` argument also triggers collection-time
-parameterization. On a multi-ASIC DUT, pytest may produce one item per eligible
-frontend ASIC.
+## 1. Collection: is this item eligible?
 
-## 2. Fixture graph
-
-The test requests three inputs:
-
-```text
-test_arp_unicast_reply
-  |
-  +-- common_setup_teardown
-  |     +-- duthosts
-  |     +-- ptfhost
-  |     +-- selected DUT and ASIC
-  |
-  +-- intfs_for_test
-  |     +-- tbinfo
-  |     +-- running config facts
-  |     +-- extended minigraph facts
-  |
-  +-- enum_frontend_asic_index
-```
-
-`common_setup_teardown` chooses the DUT, obtains the router MAC, copies PTF
-tests to `/root/ptftests`, and yields `(duthost, ptfhost, router_mac)`.
-
-`intfs_for_test` obtains the selected ASIC's minigraph facts, selects two
-eligible interfaces, and maps each DUT name through
-`minigraph_ptf_indices`. On non-`t0` topologies it temporarily adds test IP
-addresses. Its teardown removes those addresses and restores any port-channel
-membership it changed.
-
-## 3. The test call
-
-The function gets the namespace-aware ASIC object:
+The module currently declares:
 
 ```python
+pytestmark = [
+    pytest.mark.topology("t1", "t2", "lrh", "urh", "m1", "c0")
+]
+```
+
+The test is not collected for execution merely because `arp/` exists. The
+selected testbed topology must match this compatibility set, and
+conditional/completeness plugins may add further decisions.
+
+The function also requests `enum_frontend_asic_index`. Pytest parameter
+generation turns the function into a concrete node for a selected frontend
+ASIC. Another selector used by its fixtures chooses one frontend DUT per
+hardware SKU.
+
+Record both hostname and ASIC index when reporting a failure.
+
+## 2. Auto-used module setup
+
+The directory's `conftest.py` has an auto-used module fixture that changes
+the CRM polling interval on every frontend node to a short value. It waits for
+counters to update and, after the module, restores the documented default.
+
+Shared auto-used plugins may also:
+
+- run pre-test sanity and recovery;
+- place log-analysis markers;
+- start resource/process monitoring; and
+- create report sections.
+
+None appear in the test function signature, but all can affect the result.
+
+## 3. Explicit fixture graph
+
+The test requests:
+
+```python
+def test_arp_unicast_reply(
+    common_setup_teardown,
+    intfs_for_test,
+    enum_frontend_asic_index,
+):
+```
+
+### `common_setup_teardown`
+
+This module-scoped fixture:
+
+1. selects the DUT through
+   `enum_rand_one_per_hwsku_frontend_hostname`;
+2. obtains the ASIC-specific router MAC;
+3. copies the `ptftests` directory to `/root` on the PTF host; and
+4. yields `(duthost, ptfhost, router_mac)`.
+
+Its `finally` block performs a safe config reload from Config DB. That broad
+recovery is part of the module contract, not part of the individual
+assertion.
+
+### `intfs_for_test`
+
+This module-scoped fixture:
+
+1. obtains the same selected DUT and ASIC;
+2. reads extended minigraph facts using `tbinfo`;
+3. filters external ports and chooses two interfaces according to topology;
+4. maps each DUT interface through `minigraph_ptf_indices`;
+5. for non-T0 paths, may remove selected interfaces from port-channels and add
+   test IP addresses; and
+6. yields interface names and PTF indices.
+
+After tests, it removes test addresses and re-adds any modified port-channel
+members.
+
+This explains why copying the four-line test body without its conftest cannot
+reproduce the behavior.
+
+## 4. The test chooses an ASIC control object
+
+```python
+duthost, ptfhost, router_mac = common_setup_teardown
+intf1, intf2, intf1_indice, intf2_indice = intfs_for_test
 asichost = duthost.asic_instance(enum_frontend_asic_index)
 ```
 
-It clears the ARP cache, then passes the router MAC and selected PTF index to:
+`duthost` owns chassis/global operations. `asichost` scopes ARP and
+interface operations to the selected ASIC namespace. `intf1` is the SONiC
+interface; `intf1_indice` is its PTF mapping. They are deliberately kept as
+different values.
+
+## 5. Precondition: clear learned state
+
+```python
+clear_dut_arp_cache(duthost, asichost.cli_ns_option)
+```
+
+An ARP reply test must not pass because a previous test left the expected
+neighbor entry. The namespace option keeps the operation on the selected
+ASIC.
+
+This is also a cleanup dependency: if cache clearing or namespace selection is
+wrong, the packet result and final table assertion no longer test a fresh
+learn.
+
+## 6. Build the remote PTF contract
+
+The test passes:
+
+```python
+params = {
+    "acs_mac": router_mac,
+    "port": intf1_indice,
+    "kvm_support": True,
+}
+```
+
+On one VPP KVM combination it adds `no_padding=True`, because that dataplane
+does not pad the ARP reply to the Ethernet minimum frame size. This is a
+narrow, documented expectation adjustment, not a mask for arbitrary packet
+differences.
+
+The selected `port` is a PTF index derived from live minigraph facts. The PTF
+test must interpret it in the deployed PTF interface map.
+
+## 7. Execute the packet algorithm remotely
 
 ```python
 ptf_runner(
@@ -72,49 +163,84 @@ ptf_runner(
 )
 ```
 
-This crosses an execution boundary. Pytest is still running on the test
-runner, while `arptest.VerifyUnicastARPReply` executes in the PTF environment.
-The integer `port` identifies a PTF interface, not a DUT front-panel name.
+The runtime boundary is:
 
-## 4. Dataplane and state assertion
+```text
+pytest on management host
+  -> host wrapper / remote shell
+  -> PTF executable in the PTF environment
+  -> arptest.VerifyUnicastARPReply
+  -> PTF ethN dataplane
+  -> server/fanout path
+  -> selected DUT interface and ASIC
+```
 
-The PTF test emits an ARP request through the mapped interface and verifies the
-DUT's unicast reply. Control returns to pytest only after the remote test
-finishes.
+`ptf_runner` currently detects the compatible Python executable from the PTF
+image and source file; the explicit argument should not be treated as the only
+version decision. It fetches the log and pcap when configured, including on
+failure.
 
-Pytest then reads the ASIC-specific ARP table:
+The PTF class owns packet construction and packet-level verification. The
+pytest function owns the broader environment and post-packet SONiC assertion.
+
+## 8. Verify observed DUT state
 
 ```python
 switch_arptable = asichost.switch_arptable()["ansible_facts"]
+entry = switch_arptable["arptable"]["v4"]["10.10.1.3"]
+
+pytest_assert(entry["macaddress"] == "00:06:07:08:09:00")
+pytest_assert(entry["interface"] == intf1)
 ```
 
-The final assertions verify both the learned MAC and the DUT interface. The
-test therefore checks two related contracts: dataplane reply behavior and
-control-plane learning state.
+This checks two independent results:
 
-## 5. Teardown and post-processing
+- the expected IP-to-MAC binding was learned; and
+- it was learned on the selected SONiC interface.
 
-Pytest unwinds fixtures in reverse order. `intfs_for_test` restores interface
-configuration. `common_setup_teardown` uses a `finally` block to reload the
-saved DUT configuration even when setup or the PTF call raises an exception.
-After fixture teardown, Log Analyzer and post-test sanity may still fail the
-module.
+A packet reply alone would not prove the expected ARP-table ownership. A table
+entry alone would not prove that this packet caused it. The test uses both
+remote PTF behavior and DUT state to close that gap.
 
-## Read the artifacts in order
+## 9. Cleanup and final outcome
 
-1. Pytest report: was the failure in setup, call, or teardown?
-2. Remote PTF log: was a packet sent, received, malformed, or timed out?
-3. DUT facts and commands: was the selected ASIC/interface correct?
-4. Log Analyzer: did the DUT emit an unexpected error?
-5. Post-sanity output: did cleanup restore the testbed?
+After the function returns:
 
-## Reproducible reading exercise
+1. function-scope finalizers, if any, run;
+2. module fixtures remain alive for sibling tests;
+3. after the module, `intfs_for_test` restores IP and port-channel changes;
+4. `common_setup_teardown` performs safe config reload;
+5. the auto-used CRM fixture restores polling interval; and
+6. shared log/sanity plugins inspect and report the bounded run.
 
-Without running the test, locate each fixture definition, draw its dependency
-graph, and write down where every value originates. Then compare the selected
-DUT interface with `minigraph_ptf_indices`. This exercise catches the most
-common review mistake: treating fixture inputs as unexplained constants.
+Exact teardown ordering follows fixture dependencies, so inspect
+`pytest --setup-show` output rather than relying only on the list above.
 
-Deeper references: [test_arpall.py](https://github.com/sonic-net/sonic-mgmt/blob/master/tests/arp/test_arpall.py),
-[ARP conftest](https://github.com/sonic-net/sonic-mgmt/blob/master/tests/arp/conftest.py),
-and [ptf_runner.py](https://github.com/sonic-net/sonic-mgmt/blob/master/tests/ptf_runner.py).
+## Failure map
+
+| Observation | Likely owner |
+|---|---|
+| Item skipped | Topology/conditional/completeness collection |
+| No valid ports | `intfs_for_test`, topology, or live interface state |
+| Wrong PTF index | Extended minigraph mapping or selected ASIC |
+| PTF test source missing | Copy fixture or PTF image path |
+| Remote PTF process fails | Packet algorithm, PTF environment, or dataplane |
+| PTF passes but ARP entry absent | DUT learning/state-read boundary |
+| Entry exists on wrong interface | Mapping, forwarding, or stale state |
+| Test body passes but module fails | Fixture restoration, log analyzer, or sanity |
+
+## What to learn from the example
+
+The main lesson is not the ARP syntax. It is that a test's real contract
+includes:
+
+- collection eligibility;
+- DUT and ASIC parameterization;
+- fixture scopes and auto-use behavior;
+- declared-to-live port translation;
+- remote process and artifact boundaries;
+- independent packet and DUT-state assertions; and
+- restoration after partial or complete execution.
+
+[Plugin lifecycle](plugin-lifecycle.md) expands the shared behavior that wraps
+this example.

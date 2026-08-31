@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="880" viewBox="0 0 1400 880" role="img" aria-labelledby="title desc">
+  <title id="title">Dual-ToR active-standby, active-active, and mixed paths</title>
+  <desc id="desc">Three panels show an HTTP-controlled OVS smart cable for active-standby, a gRPC NIC simulator with namespaces for active-active, and both services for mixed topology, followed by four convergence truths.</desc>
+  <defs><marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#475569"/></marker>
+    <style>.h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 18px system-ui,sans-serif;fill:#0f172a}.b{font:14px system-ui,sans-serif;fill:#334155}.s{font:12px system-ui,sans-serif;fill:#475569}.p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:16}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:10}.green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:10}.purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:10}.orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:10}.line{stroke:#475569;stroke-width:2.2;fill:none;marker-end:url(#a)}.dash{stroke:#64748b;stroke-width:2;stroke-dasharray:7 6;fill:none;marker-end:url(#a)}</style>
+  </defs>
+  <rect width="1400" height="880" fill="#fff"/><text x="55" y="52" class="h1">Dual-ToR adds a stateful server attachment</text><text x="55" y="80" class="b">Upper/lower are positions; forwarding ownership is per interface and changes through simulator control.</text>
+  <rect x="45" y="115" width="415" height="480" class="p"/><text x="70" y="150" class="h2">dualtor · active-standby</text>
+  <rect x="75" y="185" width="150" height="70" class="green"/><text x="150" y="214" text-anchor="middle" class="b">Upper ToR</text><text x="150" y="237" text-anchor="middle" class="s">active or standby</text>
+  <rect x="280" y="185" width="150" height="70" class="green"/><text x="355" y="214" text-anchor="middle" class="b">Lower ToR</text><text x="355" y="237" text-anchor="middle" class="s">active or standby</text>
+  <rect x="145" y="320" width="215" height="90" class="orange"/><text x="252" y="350" text-anchor="middle" class="b">OVS smart Y-cable</text><text x="252" y="375" text-anchor="middle" class="s">per-port forwarding flows</text><text x="252" y="397" text-anchor="middle" class="s">HTTP mux_simulator</text>
+  <rect x="145" y="480" width="215" height="70" class="purple"/><text x="252" y="510" text-anchor="middle" class="b">PTF / server link</text><text x="252" y="534" text-anchor="middle" class="s">one selected ToR path</text>
+  <path d="M150 255L220 310" class="line"/><path d="M355 255L285 310" class="line"/><path d="M252 410V470" class="line"/>
+
+  <rect x="492" y="115" width="415" height="480" class="p"/><text x="517" y="150" class="h2">dualtor-aa · active-active</text>
+  <rect x="522" y="185" width="150" height="70" class="green"/><text x="597" y="214" text-anchor="middle" class="b">Upper ToR</text><text x="597" y="237" text-anchor="middle" class="s">can forward</text>
+  <rect x="727" y="185" width="150" height="70" class="green"/><text x="802" y="214" text-anchor="middle" class="b">Lower ToR</text><text x="802" y="237" text-anchor="middle" class="s">can forward</text>
+  <rect x="592" y="320" width="215" height="90" class="orange"/><text x="699" y="350" text-anchor="middle" class="b">OVS + NIC namespace</text><text x="699" y="375" text-anchor="middle" class="s">active-active dataplane</text><text x="699" y="397" text-anchor="middle" class="s">gRPC nic_simulator</text>
+  <rect x="592" y="480" width="215" height="70" class="purple"/><text x="699" y="510" text-anchor="middle" class="b">PTF / modeled NIC</text><text x="699" y="534" text-anchor="middle" class="s">both paths allowed by state</text>
+  <path d="M597 255L667 310" class="line"/><path d="M802 255L732 310" class="line"/><path d="M699 410V470" class="line"/>
+
+  <rect x="939" y="115" width="416" height="480" class="p"/><text x="964" y="150" class="h2">dualtor-mixed</text>
+  <rect x="969" y="185" width="150" height="70" class="green"/><text x="1044" y="214" text-anchor="middle" class="b">Upper ToR</text><text x="1044" y="237" text-anchor="middle" class="s">AS + AA ports</text>
+  <rect x="1174" y="185" width="150" height="70" class="green"/><text x="1249" y="214" text-anchor="middle" class="b">Lower ToR</text><text x="1249" y="237" text-anchor="middle" class="s">AS + AA ports</text>
+  <rect x="969" y="320" width="170" height="90" class="orange"/><text x="1054" y="350" text-anchor="middle" class="b">AS ports</text><text x="1054" y="375" text-anchor="middle" class="s">HTTP mux</text><text x="1054" y="397" text-anchor="middle" class="s">OVS cable</text>
+  <rect x="1154" y="320" width="170" height="90" class="orange"/><text x="1239" y="350" text-anchor="middle" class="b">AA ports</text><text x="1239" y="375" text-anchor="middle" class="s">gRPC NIC</text><text x="1239" y="397" text-anchor="middle" class="s">namespace + OVS</text>
+  <rect x="1040" y="480" width="215" height="70" class="purple"/><text x="1147" y="510" text-anchor="middle" class="b">PTF / server links</text><text x="1147" y="534" text-anchor="middle" class="s">resolve mode per interface</text>
+  <path d="M1044 255V310" class="line"/><path d="M1249 255V310" class="line"/><path d="M1054 410L1125 470" class="line"/><path d="M1239 410L1170 470" class="line"/>
+
+  <rect x="45" y="635" width="1310" height="190" class="blue"/><text x="70" y="670" class="h2">Four truths must converge before traffic assertions</text>
+  <rect x="75" y="705" width="270" height="80" class="blue"/><text x="210" y="735" text-anchor="middle" class="b">Simulator API state</text><text x="210" y="761" text-anchor="middle" class="s">request accepted + reported mode</text>
+  <rect x="385" y="705" width="270" height="80" class="orange"/><text x="520" y="735" text-anchor="middle" class="b">OVS / NIC dataplane</text><text x="520" y="761" text-anchor="middle" class="s">flows and interfaces</text>
+  <rect x="695" y="705" width="270" height="80" class="green"/><text x="830" y="735" text-anchor="middle" class="b">Both DUT control states</text><text x="830" y="761" text-anchor="middle" class="s">mux · routes · tunnel</text>
+  <rect x="1005" y="705" width="315" height="80" class="purple"/><text x="1162" y="735" text-anchor="middle" class="b">Observed packets</text><text x="1162" y="761" text-anchor="middle" class="s">direction, ownership, loss, duplicate</text>
+</svg>

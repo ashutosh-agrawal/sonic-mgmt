@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
+  <title id="title">ARP unicast reply test flow</title>
+  <desc id="desc">An annotated sequence from topology collection and fixtures through remote PTF traffic, ASIC ARP-table assertions, and module cleanup.</desc>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#475569"/></marker>
+    <style>
+      .h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 18px system-ui,sans-serif;fill:#0f172a}
+      .b{font:15px system-ui,sans-serif;fill:#334155}.s{font:13px system-ui,sans-serif;fill:#475569}
+      .p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:16}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:12}
+      .green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:12}.purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:12}
+      .orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:12}.red{fill:#fee2e2;stroke:#dc2626;stroke-width:2;rx:12}
+      .line{stroke:#475569;stroke-width:2.3;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1400" height="900" fill="#fff"/>
+  <text x="55" y="52" class="h1">test_arp_unicast_reply is a distributed workflow</text>
+  <text x="55" y="80" class="b">The short test body sits between collection policy, module mutations, a remote PTF process, and broad restoration.</text>
+
+  <rect x="55" y="115" width="1290" height="130" class="purple"/>
+  <text x="80" y="148" class="h2">1 · Collection and parameterization</text>
+  <text x="90" y="183" class="b">Topology marker</text><text x="255" y="183" class="s">t1 · t2 · lrh · urh · m1 · c0</text>
+  <text x="545" y="183" class="b">DUT selection</text><text x="680" y="183" class="s">one frontend DUT per HWSKU</text>
+  <text x="985" y="183" class="b">ASIC parameter</text><text x="1135" y="183" class="s">frontend ASIC index</text>
+  <text x="90" y="218" class="s">Conditional marks and completeness policy can still skip, xfail, or filter the concrete node.</text>
+
+  <rect x="55" y="285" width="400" height="210" class="blue"/>
+  <text x="80" y="318" class="h2">2 · Module fixture setup</text>
+  <text x="85" y="354" class="b">Auto-use</text><text x="185" y="354" class="s">short CRM polling interval</text>
+  <text x="85" y="386" class="b">common setup</text><text x="205" y="386" class="s">DUT · PTF · router MAC</text>
+  <text x="85" y="418" class="b">PTF files</text><text x="185" y="418" class="s">copy ptftests to /root</text>
+  <text x="85" y="450" class="b">interfaces</text><text x="185" y="450" class="s">select and possibly reconfigure</text>
+  <text x="85" y="480" class="s">Extended minigraph facts map SONiC interface → PTF index.</text>
+
+  <rect x="500" y="285" width="400" height="210" class="green"/>
+  <text x="525" y="318" class="h2">3 · Test call and packet path</text>
+  <text x="530" y="354" class="b">ASIC view</text><text x="640" y="354" class="s">duthost.asic_instance(index)</text>
+  <text x="530" y="386" class="b">Precondition</text><text x="650" y="386" class="s">clear ARP cache in namespace</text>
+  <text x="530" y="418" class="b">Remote call</text><text x="645" y="418" class="s">ptf_runner(VerifyUnicastARPReply)</text>
+  <text x="530" y="450" class="b">Dataplane</text><text x="640" y="450" class="s">PTF ethN → DUT interface</text>
+  <text x="530" y="480" class="s">PTF owns packet construction, reply verification, log, and pcap.</text>
+
+  <rect x="945" y="285" width="400" height="210" class="green"/>
+  <text x="970" y="318" class="h2">4 · DUT state assertion</text>
+  <text x="975" y="354" class="b">Read</text><text x="1055" y="354" class="s">ASIC switch_arptable facts</text>
+  <text x="975" y="386" class="b">Key</text><text x="1055" y="386" class="s">IPv4 10.10.1.3</text>
+  <text x="975" y="418" class="b">Assert</text><text x="1055" y="418" class="s">expected learned MAC</text>
+  <text x="975" y="450" class="b">Assert</text><text x="1055" y="450" class="s">selected SONiC interface</text>
+  <text x="975" y="480" class="s">Packet and DUT state are independent evidence.</text>
+  <path d="M455 390H490" class="line"/><path d="M900 390H935" class="line"/>
+
+  <rect x="55" y="535" width="1290" height="150" class="orange"/>
+  <text x="80" y="570" class="h2">5 · Module teardown and post-checks</text>
+  <text x="90" y="608" class="b">Interface fixture</text><text x="230" y="608" class="s">remove test IPs · restore port-channel members</text>
+  <text x="585" y="608" class="b">Common setup</text><text x="715" y="608" class="s">safe Config DB reload</text>
+  <text x="1000" y="608" class="b">Auto-use</text><text x="1090" y="608" class="s">restore CRM interval</text>
+  <text x="90" y="650" class="s">Shared log analysis and post-sanity can change the final status after the function's assertions pass.</text>
+  <path d="M1145 495V525" class="line"/>
+
+  <rect x="55" y="725" width="1290" height="120" class="p"/>
+  <text x="80" y="758" class="h2">Identity preserved across the workflow</text>
+  <text x="90" y="798" class="b">selected DUT</text><text x="205" y="798" class="s">+</text>
+  <text x="230" y="798" class="b">frontend ASIC namespace</text><text x="445" y="798" class="s">+</text>
+  <text x="470" y="798" class="b">SONiC interface</text><text x="620" y="798" class="s">↔</text>
+  <text x="650" y="798" class="b">live PTF index</text><text x="790" y="798" class="s">+</text>
+  <text x="820" y="798" class="b">owning PTF host</text><text x="980" y="798" class="s">+</text>
+  <text x="1010" y="798" class="b">run artifacts</text>
+</svg>

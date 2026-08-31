@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">Plugin hooks across pytest phases</title>
+  <desc id="desc">A matrix showing conditional marks and completeness at collection, sanity and log markers in setup, monitors and PTF during calls, finalizers and analysis in teardown, and reporting hooks at session completion.</desc>
+  <defs>
+    <style>
+      .h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 18px system-ui,sans-serif;fill:#0f172a}
+      .b{font:15px system-ui,sans-serif;fill:#334155}.s{font:13px system-ui,sans-serif;fill:#475569}
+      .p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:14}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:10}
+      .green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:10}.purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:10}
+      .orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:10}.red{fill:#fee2e2;stroke:#dc2626;stroke-width:2;rx:10}
+      .grid{stroke:#cbd5e1;stroke-width:1.5}
+    </style>
+  </defs>
+  <rect width="1400" height="820" fill="#fff"/>
+  <text x="55" y="52" class="h1">Plugins act before and after the visible test body</text>
+  <text x="55" y="80" class="b">Hooks make collection policy; auto-used fixtures wrap remote setup, call, and restoration.</text>
+
+  <rect x="45" y="115" width="1310" height="535" class="p"/>
+  <line x1="275" y1="115" x2="275" y2="650" class="grid"/>
+  <line x1="485" y1="115" x2="485" y2="650" class="grid"/>
+  <line x1="695" y1="115" x2="695" y2="650" class="grid"/>
+  <line x1="905" y1="115" x2="905" y2="650" class="grid"/>
+  <line x1="1115" y1="115" x2="1115" y2="650" class="grid"/>
+  <line x1="45" y1="175" x2="1355" y2="175" class="grid"/>
+  <line x1="45" y1="290" x2="1355" y2="290" class="grid"/>
+  <line x1="45" y1="405" x2="1355" y2="405" class="grid"/>
+  <line x1="45" y1="520" x2="1355" y2="520" class="grid"/>
+
+  <text x="160" y="151" text-anchor="middle" class="h2">Plugin / policy</text>
+  <text x="380" y="151" text-anchor="middle" class="h2">Collection</text>
+  <text x="590" y="151" text-anchor="middle" class="h2">Setup</text>
+  <text x="800" y="151" text-anchor="middle" class="h2">Call</text>
+  <text x="1010" y="151" text-anchor="middle" class="h2">Teardown</text>
+  <text x="1235" y="151" text-anchor="middle" class="h2">Report/session</text>
+
+  <text x="70" y="215" class="h2">Selection</text>
+  <text x="70" y="242" class="s">topology · conditions</text>
+  <text x="70" y="265" class="s">completeness · DUT/ASIC</text>
+  <rect x="300" y="195" width="160" height="70" class="purple"/>
+  <text x="380" y="223" text-anchor="middle" class="b">expand + mark</text>
+  <text x="380" y="247" text-anchor="middle" class="s">skip / xfail / filter</text>
+
+  <text x="70" y="330" class="h2">Health policy</text>
+  <text x="70" y="357" class="s">sanity + recovery</text>
+  <rect x="510" y="310" width="160" height="70" class="green"/>
+  <text x="590" y="338" text-anchor="middle" class="b">pre-check</text>
+  <text x="590" y="362" text-anchor="middle" class="s">recover / reject</text>
+  <rect x="930" y="310" width="160" height="70" class="orange"/>
+  <text x="1010" y="338" text-anchor="middle" class="b">post-check</text>
+  <text x="1010" y="362" text-anchor="middle" class="s">recover / report</text>
+
+  <text x="70" y="445" class="h2">Observation</text>
+  <text x="70" y="472" class="s">logs · resources</text>
+  <text x="70" y="495" class="s">PTF · feature services</text>
+  <rect x="510" y="425" width="160" height="70" class="blue"/>
+  <text x="590" y="453" text-anchor="middle" class="b">start / marker</text>
+  <text x="590" y="477" text-anchor="middle" class="s">create services</text>
+  <rect x="720" y="425" width="160" height="70" class="blue"/>
+  <text x="800" y="453" text-anchor="middle" class="b">observe</text>
+  <text x="800" y="477" text-anchor="middle" class="s">traffic + monitors</text>
+  <rect x="930" y="425" width="160" height="70" class="orange"/>
+  <text x="1010" y="453" text-anchor="middle" class="b">stop / analyze</text>
+  <text x="1010" y="477" text-anchor="middle" class="s">logs + finalizers</text>
+
+  <text x="70" y="560" class="h2">Evidence</text>
+  <text x="70" y="587" class="s">sections · attachments</text>
+  <text x="70" y="610" class="s">JUnit / Allure metadata</text>
+  <rect x="1150" y="540" width="170" height="80" class="red"/>
+  <text x="1235" y="568" text-anchor="middle" class="b">compose outcome</text>
+  <text x="1235" y="592" text-anchor="middle" class="s">call + teardown</text>
+  <text x="1235" y="613" text-anchor="middle" class="s">post-check + artifacts</text>
+
+  <rect x="45" y="690" width="1310" height="85" class="red"/>
+  <text x="70" y="724" class="h2">Final status is composed</text>
+  <text x="70" y="754" class="b">A passing function can fail on unexpected DUT logs, restoration, or post-sanity; a skipped item never entered setup.</text>
+</svg>

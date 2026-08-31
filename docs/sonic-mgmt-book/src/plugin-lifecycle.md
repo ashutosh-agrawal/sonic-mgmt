@@ -1,84 +1,196 @@
 # Plugin lifecycle
 
-Plugins explain why behavior appears before and after a short test function.
-The useful question is not only “what does this plugin do?” but “at which
-pytest phase can it change the outcome?”
+Plugins make repository-wide policy executable. They select tests, construct
+shared services, check the lab, bound log intervals, monitor resources, and
+alter the final outcome. Their power comes from running outside the visible
+test body.
 
-## Timeline
+![Where sonic-mgmt plugins act in the pytest lifecycle](images/plugin-hooks.svg)
 
-| Phase | Important sonic-mgmt behavior |
+## Documentation basis
+
+| Source | Contribution |
 |---|---|
-| command parsing | plugins register repository-specific options |
-| configuration | custom markers are registered |
-| collection | test modules become items; parameters are generated |
-| collection modification | topology and conditional skip/xfail rules are applied |
-| setup | fixtures create hosts, PTF agents, log markers, and sanity baselines |
-| call | the test body runs |
-| teardown | fixtures restore state and analyze logs |
-| session finish | aggregate sanity/reporting state can affect the exit status |
+| `tests/conftest.py::pytest_plugins` | Current shared plugin registration |
+| [Conditional mark plugin][conditional-mark] | Fact-driven skip, xfail, and custom marks |
+| [Sanity-check plugin][sanity] | Pre/post checks, recovery, marker and CLI controls |
+| [Log analyzer][loganalyzer] | Bounded DUT log analysis and regex policy |
+| [PTF adapter][ptfadapter] | Module-scoped PTF-agent integration |
+| [Test completeness][completeness] | Debug/basic/confident/thorough collection levels |
+| [Pytest logging][logging] | Console/file capture and remote-operation logging |
 
-## Custom markers
+## Hook functions and plugin fixtures
 
-`tests/common/plugins/custom_markers/__init__.py` registers topology, feature,
-ASIC, connection-type, device-type, and completeness markers. Its
-`pytest_collection_modifyitems` hook checks topology compatibility. Its
-`pytest_runtest_setup` hook enforces other marker constraints.
+Two mechanisms add behavior:
 
-A topology marker is declarative compatibility. It neither creates a topology
-nor proves all feature prerequisites are satisfied.
+- **hooks** receive pytest events such as option parsing, collection, report
+  generation, or session finish;
+- **fixtures**, often auto-used, join the fixture graph and can wrap setup,
+  call, and teardown with `yield`.
 
-## Conditional marks
+A plugin can use both. To understand one, search for `pytest_*` hooks,
+`@pytest.fixture`, auto-use, fixture scope, command-line options, markers, and
+finalizers.
 
-`conditional_mark` loads condition files, gathers basic DUT facts, matches
-rules against collected node IDs, evaluates expressions, and adds `skip` or
-`xfail` marks. Its collection-modification hook runs late so earlier topology
-selection can avoid expensive DUT fact loading when every item is already
-skipped.
+## Collection-time policy
 
-When a test is unexpectedly skipped, record the exact node ID and search all
-conditional-mark YAML files for the matching prefix before editing the test.
+### Topology/custom markers
 
-## Sanity checks
+Root collection logic compares a test's topology marker with the selected
+testbed type/name and applies repository selection rules. It can also validate
+custom markers and generate DUT/ASIC parameters.
 
-The module-scoped autouse `sanity_check` fixture wraps test execution.
-Pre-checks can validate services, interfaces, BGP, processes, and other
-baseline state. Post-checks detect damage left by the test. Recovery may run
-when enabled.
+### Conditional marks
 
-In parallel execution, leader/follower coordination prevents every worker from
-performing conflicting full-testbed recovery. A sanity failure is therefore
-not equivalent to an assertion failure in the test body.
+The conditional-mark plugin loads condition files and testbed/device facts.
+For a collected node it finds matching entries, evaluates their conditions,
+and applies marks such as skip or xfail. More than one mark type can apply.
+When node-ID patterns overlap, current matching behavior favors the most
+specific/longest matching node path with true conditions.
 
-## Log Analyzer
+This creates a provenance requirement. An unexpected xfail is not explained
+by the test module alone; record:
 
-The autouse `loganalyzer` fixture places markers in DUT logs before the test
-and analyzes the bounded interval afterward. Expected and ignored regexes can
-be extended by tests, but broad ignore patterns can hide real regressions.
+- final node ID;
+- matching condition-file entry;
+- collected facts;
+- evaluated condition; and
+- mark reason.
 
-`--disable_loganalyzer` is a debugging control, not a normal way to make a test
-pass. Determine whether the log is caused by the test, stale environmental
-noise, or an incomplete expectation rule.
+### Test completeness
 
-## PTF adapter
+Completeness levels express how extensively a feature should be tested:
+`debug`, `basic`, `confident`, and `thorough`. The plugin filters or
+parameterizes items according to the requested level. `diagnose` is treated
+separately rather than as the next ordered completeness level.
 
-The module-scoped `ptfadapter` fixture creates or connects to PTF NN agents,
-constructs device-socket mappings, and returns a `PtfTestAdapter`. Tests then
-send and verify packets while pytest keeps control-plane orchestration local.
+Do not use completeness to encode topology compatibility or known product
+defects; those are different policies.
 
-Remote `ptf_runner` tests are a separate execution style. Both use PTF, but
-their process boundary, logs, and failure reporting differ.
+## Setup and teardown policy
 
-## Debugging exercise
+### Sanity checks
 
-Run `pytest --collect-only` for one node ID with normal verbosity. Then answer:
+The sanity plugin currently exposes a module-scoped auto-used wrapper that
+dynamically invokes the full check when appropriate. The full path can:
 
-1. Which plugin registered each custom option?
-2. Which collection hook could skip the item?
-3. Which autouse fixtures run despite not appearing in the function signature?
-4. Which failures can occur after the call phase reports success?
+- run configured checks before a module;
+- retry conditions such as networking uptime;
+- attempt recovery actions;
+- coordinate parallel execution;
+- run selected checks after the module; and
+- report failed checks and recovery results.
 
-Deeper references: [custom markers](https://github.com/sonic-net/sonic-mgmt/tree/master/tests/common/plugins/custom_markers),
-[conditional marks](https://github.com/sonic-net/sonic-mgmt/tree/master/tests/common/plugins/conditional_mark),
-[sanity checks](https://github.com/sonic-net/sonic-mgmt/tree/master/tests/common/plugins/sanity_check),
-[Log Analyzer](https://github.com/sonic-net/sonic-mgmt/tree/master/tests/common/plugins/loganalyzer),
-and [PTF adapter](https://github.com/sonic-net/sonic-mgmt/tree/master/tests/common/plugins/ptfadapter).
+CLI options and markers control check items, recovery, and pre/post behavior.
+Read the plugin README for precedence. A marker that narrows checks can change
+the safety envelope for every test in its module.
+
+Sanity has two purposes that should not be conflated:
+
+1. reject an environment that cannot produce a meaningful test result;
+2. restore a recoverable environment so later tests can proceed.
+
+A successful recovery does not erase the original failure. Preserve both
+pieces of evidence.
+
+### Log analyzer
+
+The log analyzer places markers around a test interval on participating DUTs,
+then retrieves and evaluates logs.
+
+Its regex sets have different semantics:
+
+- **match**: patterns treated as unexpected errors;
+- **ignore**: known messages removed from failure consideration;
+- **expect**: messages that must occur for a particular test.
+
+Module/test markers can add patterns or disable analysis. Over-broad ignore
+patterns create false passes; broad match patterns create noise. Anchor
+feature-specific expressions and document why an ignore is safe.
+
+Because analysis runs after the call, a function can finish its assertions and
+still have a failed final report.
+
+### Resource and process monitors
+
+Shared plugins can record DUT memory utilization, process CPU/memory, and
+other health data. These provide correlation evidence; a transient metric is
+not automatically the feature's root cause.
+
+## PTF and feature plugins
+
+The PTF adapter plugin creates persistent agents and interface maps used by
+packet tests. Dual-ToR, decap, platform API, PDU, and other plugins contribute
+feature-specific fixtures and options.
+
+Registration at the root does not mean every fixture performs remote work for
+every test. Pytest instantiates a fixture when the graph requests it, unless it
+is auto-used.
+
+## Option and marker precedence
+
+There is no repository-wide precedence rule. Each plugin defines how it
+combines:
+
+- built-in defaults;
+- configuration files;
+- command-line options;
+- module/class/function markers;
+- collected testbed/device facts; and
+- runtime observations.
+
+For a surprising behavior, find the plugin's parser and decision function.
+Documentation may explain intent; current code decides the run.
+
+## The final report is composed
+
+```text
+collection decision
+  + setup outcome
+  + test-call outcome
+  + teardown outcome
+  + plugin post-checks
+  + reporting hooks
+  = user-visible node/session result
+```
+
+Examples:
+
+| Test body | Wrapper behavior | Final result |
+|---|---|---|
+| Passed | Unexpected DUT error matched | Failed |
+| Passed | Fixture restoration failed | Error/failed |
+| Failed | Condition marked strict xfail | Expected or failed according to mark |
+| Not run | Conditional skip applied | Skipped with plugin reason |
+| Passed | Post-sanity recovered DUT | Result plus recovery evidence; policy determines status |
+
+## Diagnose plugin behavior
+
+1. Collect the exact node ID and final marker list.
+2. Use `--setup-show` or fixture introspection to expose auto-used fixtures.
+3. Enable the documented log level/file output.
+4. Search the plugin for its pytest hooks, fixture scope, options, and markers.
+5. Separate precondition, feature call, teardown, and post-check timestamps.
+6. Inspect the plugin-specific evidence: evaluated conditions, sanity check
+   results, log marker interval, monitor output, or PTF-agent state.
+
+## Design and review rules
+
+- Keep collection decisions deterministic from recorded inputs.
+- Include a reason with skip/xfail and make it specific enough to retire.
+- Do not catch a feature failure merely to let cleanup appear successful.
+- Keep auto-used remote work scoped and visible in logs.
+- Make finalizers idempotent after partial setup.
+- Test plugin behavior at its pytest hook/fixture boundary, not only helper
+  functions.
+- Treat changes to root registration or auto-use as repository-wide changes.
+
+The next part applies this execution model to concrete topology and lab
+construction.
+
+[conditional-mark]: https://github.com/sonic-net/sonic-mgmt/blob/master/tests/common/plugins/conditional_mark/README.md
+[sanity]: https://github.com/sonic-net/sonic-mgmt/blob/master/tests/common/plugins/sanity_check/README.md
+[loganalyzer]: https://github.com/sonic-net/sonic-mgmt/blob/master/tests/common/plugins/loganalyzer/README.md
+[ptfadapter]: https://github.com/sonic-net/sonic-mgmt/blob/master/tests/common/plugins/ptfadapter/README.md
+[completeness]: https://github.com/sonic-net/sonic-mgmt/blob/master/tests/common/plugins/test_completeness/README.md
+[logging]: https://github.com/sonic-net/sonic-mgmt/blob/master/docs/tests/pytest.logging.md

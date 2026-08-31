@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="880" viewBox="0 0 1400 880" role="img" aria-labelledby="title desc">
+  <title id="title">SmartSwitch NPU and DPU boundaries</title>
+  <desc id="desc">A management host controls an NPU and separate DPU, programs the DPU pipeline through APIs, and sends PTF traffic through virtual OVS or physical NPU-DPU links to network endpoints, with separate readiness gates.</desc>
+  <defs><marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#475569"/></marker><marker id="g" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#16a34a"/></marker>
+    <style>.h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 18px system-ui,sans-serif;fill:#0f172a}.b{font:14px system-ui,sans-serif;fill:#334155}.s{font:12px system-ui,sans-serif;fill:#475569}.p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:16}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:10}.green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:10}.purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:10}.orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:10}.line{stroke:#475569;stroke-width:2.3;fill:none;marker-end:url(#a)}.data{stroke:#16a34a;stroke-width:4;fill:none;marker-end:url(#g)}.dash{stroke:#64748b;stroke-width:2;stroke-dasharray:7 6;fill:none;marker-end:url(#a)}</style>
+  </defs>
+  <rect width="1400" height="880" fill="#fff"/><text x="55" y="52" class="h1">SmartSwitch has separate NPU and DPU control planes</text><text x="55" y="80" class="b">A healthy NPU does not prove DPU management, pipeline readiness, or end-to-end offload behavior.</text>
+  <rect x="45" y="115" width="1310" height="245" class="blue"/><text x="70" y="150" class="h2">Management and API control</text>
+  <rect x="80" y="190" width="230" height="100" class="blue"/><text x="195" y="222" text-anchor="middle" class="h2">pytest</text><text x="195" y="250" text-anchor="middle" class="b">duthosts + dpuhosts</text><text x="195" y="275" text-anchor="middle" class="s">explicit target ownership</text>
+  <rect x="410" y="190" width="260" height="100" class="green"/><text x="540" y="222" text-anchor="middle" class="h2">NPU SONiC</text><text x="540" y="250" text-anchor="middle" class="b">external network switch</text><text x="540" y="275" text-anchor="middle" class="s">own image, services, ASIC</text>
+  <rect x="760" y="190" width="260" height="100" class="orange"/><text x="890" y="222" text-anchor="middle" class="h2">DPU SONiC</text><text x="890" y="250" text-anchor="middle" class="b">offload services</text><text x="890" y="275" text-anchor="middle" class="s">separate management identity</text>
+  <rect x="1110" y="190" width="210" height="100" class="purple"/><text x="1215" y="222" text-anchor="middle" class="h2">DASH pipeline</text><text x="1215" y="250" text-anchor="middle" class="b">gNMI / P4Runtime</text><text x="1215" y="275" text-anchor="middle" class="s">BMv2 or hardware</text>
+  <path d="M310 225H400" class="line"/><path d="M310 255C500 330 690 330 750 255" class="line"/><path d="M1020 240H1100" class="line"/>
+
+  <rect x="45" y="400" width="1310" height="250" class="green"/><text x="70" y="435" class="h2">Dataplane · exact path is topology and platform dependent</text>
+  <rect x="80" y="495" width="205" height="90" class="purple"/><text x="182" y="527" text-anchor="middle" class="h2">PTF / TGEN</text><text x="182" y="555" text-anchor="middle" class="s">injection + observation</text>
+  <rect x="365" y="495" width="235" height="90" class="green"/><text x="482" y="527" text-anchor="middle" class="h2">NPU port/path</text><text x="482" y="555" text-anchor="middle" class="s">routes + external links</text>
+  <rect x="680" y="495" width="235" height="90" class="blue"/><text x="797" y="527" text-anchor="middle" class="h2">NPU–DPU link</text><text x="797" y="555" text-anchor="middle" class="s">OVS/veth or physical</text>
+  <rect x="995" y="495" width="325" height="90" class="orange"/><text x="1157" y="527" text-anchor="middle" class="h2">DPU offload pipeline</text><text x="1157" y="555" text-anchor="middle" class="s">objects → transform/forward/drop</text>
+  <path d="M285 540H355" class="data"/><path d="M600 540H670" class="data"/><path d="M915 540H985" class="data"/>
+  <text x="700" y="625" text-anchor="middle" class="s">Place captures/counters on both sides of the DPU boundary.</text>
+
+  <rect x="45" y="690" width="1310" height="140" class="p"/><text x="70" y="725" class="h2">Independent readiness gates</text>
+  <text x="80" y="766" class="b">1 NPU management/config</text><text x="300" y="766" class="b">2 DPU management/services</text><text x="550" y="766" class="b">3 NPU–DPU link/underlay</text><text x="800" y="766" class="b">4 API/pipeline compatibility</text><text x="1080" y="766" class="b">5 reconciled objects</text>
+  <text x="80" y="802" class="s">Virtual setup documents are branch-specific snapshots; verify current topology, images, and API consumers.</text>
+</svg>

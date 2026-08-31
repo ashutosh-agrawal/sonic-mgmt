@@ -39,4 +39,4 @@
 - [A guided code tour](code-tour.md)
 - [Map of existing documentation](documentation-map.md)
 - [Glossary](glossary.md)
-- [Roadmap and status](roadmap.md)
+- [Roadmap and maintenance](roadmap.md)

@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="840" viewBox="0 0 1400 840" role="img" aria-labelledby="title desc">
+  <title id="title">Fixture and remote host object model</title>
+  <desc id="desc">A diagram showing pytest fixture selection, local host wrappers, remote management calls, and DUT ASIC, PTF, neighbor, and fanout targets.</desc>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#475569"/></marker>
+    <style>
+      .h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 19px system-ui,sans-serif;fill:#0f172a}
+      .b{font:15px system-ui,sans-serif;fill:#334155}.s{font:13px system-ui,sans-serif;fill:#475569}
+      .p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:16}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:12}
+      .green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:12}.purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:12}
+      .orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:12}.line{stroke:#475569;stroke-width:2.3;fill:none;marker-end:url(#a)}
+      .dash{stroke:#64748b;stroke-width:2;stroke-dasharray:7 6;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1400" height="840" fill="#fff"/>
+  <text x="55" y="52" class="h1">Fixtures build a local control model of remote systems</text>
+  <text x="55" y="80" class="b">Selection and object construction happen locally; method calls cross the management boundary.</text>
+
+  <rect x="45" y="110" width="400" height="670" class="p"/>
+  <text x="70" y="145" class="h2">Pytest process · management host</text>
+  <rect x="75" y="175" width="340" height="80" class="blue"/>
+  <text x="245" y="205" text-anchor="middle" class="h2">Selected descriptions</text>
+  <text x="245" y="230" text-anchor="middle" class="b">CLI · inventory · testbed · topology</text>
+  <rect x="75" y="290" width="155" height="65" class="purple"/>
+  <text x="152" y="318" text-anchor="middle" class="h2">tbinfo</text>
+  <text x="152" y="340" text-anchor="middle" class="s">normalized entry</text>
+  <rect x="260" y="290" width="155" height="65" class="purple"/>
+  <text x="337" y="318" text-anchor="middle" class="h2">selectors</text>
+  <text x="337" y="340" text-anchor="middle" class="s">DUT · ASIC · role</text>
+  <rect x="75" y="395" width="340" height="280" class="blue"/>
+  <text x="245" y="427" text-anchor="middle" class="h2">Local Python objects</text>
+  <text x="105" y="468" class="b">duthosts</text><text x="215" y="468" class="s">DutHosts collection</text>
+  <text x="105" y="505" class="b">duthost</text><text x="215" y="505" class="s">SonicHost</text>
+  <text x="105" y="542" class="b">asichost</text><text x="215" y="542" class="s">SonicAsic namespace</text>
+  <text x="105" y="579" class="b">ptfhosts</text><text x="215" y="579" class="s">one per server</text>
+  <text x="105" y="616" class="b">nbrhosts</text><text x="215" y="616" class="s">named neighbors</text>
+  <text x="105" y="653" class="b">fanouthosts</text><text x="215" y="653" class="s">physical transport</text>
+  <path d="M245 255V280" class="line"/><path d="M152 355V385" class="line"/><path d="M337 355V385" class="line"/>
+
+  <rect x="485" y="110" width="350" height="670" class="p"/>
+  <text x="510" y="145" class="h2">Management call boundary</text>
+  <rect x="515" y="190" width="290" height="125" class="blue"/>
+  <text x="660" y="220" text-anchor="middle" class="h2">Host/helper method</text>
+  <text x="660" y="248" text-anchor="middle" class="b">shell · command · config_facts</text>
+  <text x="660" y="273" text-anchor="middle" class="b">switch_arptable · ASIC helpers</text>
+  <text x="660" y="298" text-anchor="middle" class="s">structured contract varies</text>
+  <rect x="515" y="365" width="290" height="125" class="purple"/>
+  <text x="660" y="395" text-anchor="middle" class="h2">Ansible transport</text>
+  <text x="660" y="423" text-anchor="middle" class="b">inventory variables</text>
+  <text x="660" y="448" text-anchor="middle" class="b">connection + module</text>
+  <text x="660" y="473" text-anchor="middle" class="s">remote execution</text>
+  <rect x="515" y="540" width="290" height="140" class="green"/>
+  <text x="660" y="570" text-anchor="middle" class="h2">Serialized result</text>
+  <text x="660" y="600" text-anchor="middle" class="b">rc · stdout · stderr</text>
+  <text x="660" y="625" text-anchor="middle" class="b">ansible_facts · changed</text>
+  <text x="660" y="653" text-anchor="middle" class="s">returned to local assertion</text>
+  <path d="M660 315V355" class="line"/><path d="M660 490V530" class="line"/>
+  <path d="M445 530H505" class="line"/>
+
+  <rect x="875" y="110" width="480" height="670" class="p"/>
+  <text x="900" y="145" class="h2">Remote targets</text>
+  <rect x="910" y="180" width="410" height="150" class="green"/>
+  <text x="1115" y="211" text-anchor="middle" class="h2">SONiC DUT / chassis</text>
+  <rect x="940" y="235" width="160" height="65" class="green"/>
+  <text x="1020" y="261" text-anchor="middle" class="b">global host</text>
+  <text x="1020" y="283" text-anchor="middle" class="s">services · config</text>
+  <rect x="1130" y="235" width="160" height="65" class="green"/>
+  <text x="1210" y="261" text-anchor="middle" class="b">ASIC namespace</text>
+  <text x="1210" y="283" text-anchor="middle" class="s">ports · routes · ARP</text>
+  <rect x="910" y="370" width="190" height="105" class="purple"/>
+  <text x="1005" y="403" text-anchor="middle" class="h2">PTF host(s)</text>
+  <text x="1005" y="430" text-anchor="middle" class="b">container · agent</text>
+  <text x="1005" y="454" text-anchor="middle" class="s">packet interfaces</text>
+  <rect x="1130" y="370" width="190" height="105" class="purple"/>
+  <text x="1225" y="403" text-anchor="middle" class="h2">Neighbors</text>
+  <text x="1225" y="430" text-anchor="middle" class="b">vEOS · cEOS · NOS</text>
+  <text x="1225" y="454" text-anchor="middle" class="s">routing state</text>
+  <rect x="910" y="515" width="190" height="105" class="orange"/>
+  <text x="1005" y="548" text-anchor="middle" class="h2">Fanouts</text>
+  <text x="1005" y="575" text-anchor="middle" class="b">ports · VLANs</text>
+  <text x="1005" y="599" text-anchor="middle" class="s">physical mapping</text>
+  <rect x="1130" y="515" width="190" height="105" class="orange"/>
+  <text x="1225" y="548" text-anchor="middle" class="h2">Console / PDU</text>
+  <text x="1225" y="575" text-anchor="middle" class="b">out-of-band</text>
+  <text x="1225" y="599" text-anchor="middle" class="s">recovery path</text>
+  <rect x="910" y="660" width="410" height="75" class="blue"/>
+  <text x="1115" y="689" text-anchor="middle" class="h2">Ownership coordinate</text>
+  <text x="1115" y="717" text-anchor="middle" class="b">DUT · ASIC · PTF host · interface · role</text>
+  <path d="M805 427H900" class="line"/>
+  <path d="M900 255C850 255 850 610 815 610" class="dash"/>
+</svg>

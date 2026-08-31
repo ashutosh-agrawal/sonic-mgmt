@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">QoS parameter and RPC test pipeline</title>
+  <desc id="desc">Platform, topology, port, cable, and runtime QoS facts are combined with parameter files to create remote PTF SAI test arguments, then packet results and DUT counters are compared before normal syncd is restored.</desc>
+  <defs><marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#475569"/></marker>
+    <style>.h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 18px system-ui,sans-serif;fill:#0f172a}.b{font:14px system-ui,sans-serif;fill:#334155}.s{font:12px system-ui,sans-serif;fill:#475569}.p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:16}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:10}.green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:10}.purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:10}.orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:10}.red{fill:#fee2e2;stroke:#dc2626;stroke-width:2;rx:10}.line{stroke:#475569;stroke-width:2.3;fill:none;marker-end:url(#a)}</style>
+  </defs>
+  <rect width="1400" height="820" fill="#fff"/><text x="55" y="52" class="h1">QoS expectations are resolved for one hardware path</text><text x="55" y="80" class="b">Packet counts and thresholds are products of platform data, live configuration, and measurement rules.</text>
+  <rect x="45" y="115" width="400" height="380" class="p"/><text x="70" y="150" class="h2">Inputs</text>
+  <rect x="75" y="180" width="340" height="70" class="blue"/><text x="245" y="208" text-anchor="middle" class="b">DUT · ASIC · HWSKU</text><text x="245" y="232" text-anchor="middle" class="s">cell size · platform behavior</text>
+  <rect x="75" y="270" width="340" height="70" class="purple"/><text x="245" y="298" text-anchor="middle" class="b">topology · port · PTF mapping</text><text x="245" y="322" text-anchor="middle" class="s">speed · cable length · role</text>
+  <rect x="75" y="360" width="340" height="70" class="green"/><text x="245" y="388" text-anchor="middle" class="b">runtime buffer and QoS state</text><text x="245" y="412" text-anchor="middle" class="s">profiles · maps · queues · PGs</text>
+  <text x="75" y="468" class="s">+ qos_params YAML, generator, and overrides</text>
+  <rect x="500" y="115" width="400" height="380" class="blue"/><text x="525" y="150" class="h2">Resolution and execution</text>
+  <rect x="530" y="180" width="340" height="85" class="blue"/><text x="700" y="210" text-anchor="middle" class="b">merge and calculate parameters</text><text x="700" y="235" text-anchor="middle" class="s">exact · cells/rounding · margin · leak-out</text>
+  <rect x="530" y="295" width="340" height="85" class="orange"/><text x="700" y="325" text-anchor="middle" class="b">optional RPC syncd swap</text><text x="700" y="350" text-anchor="middle" class="s">verify image · service · SAI compatibility</text>
+  <rect x="530" y="410" width="340" height="60" class="purple"/><text x="700" y="438" text-anchor="middle" class="b">ptf_runner → sai_qos_tests</text><text x="700" y="458" text-anchor="middle" class="s">packets + RPC operations</text>
+  <path d="M445 305H490" class="line"/>
+  <rect x="955" y="115" width="400" height="380" class="p"/><text x="980" y="150" class="h2">Correlated observations</text>
+  <rect x="985" y="180" width="340" height="70" class="purple"/><text x="1155" y="208" text-anchor="middle" class="b">PTF transmit / receive</text><text x="1155" y="232" text-anchor="middle" class="s">packet counts and behavior</text>
+  <rect x="985" y="270" width="340" height="70" class="green"/><text x="1155" y="298" text-anchor="middle" class="b">DUT queue / PG / PFC counters</text><text x="1155" y="322" text-anchor="middle" class="s">clear or baseline first</text>
+  <rect x="985" y="360" width="340" height="70" class="green"/><text x="1155" y="388" text-anchor="middle" class="b">watermarks / drops / recovery</text><text x="1155" y="412" text-anchor="middle" class="s">asynchronous observation rules</text>
+  <path d="M900 305H945" class="line"/>
+  <rect x="45" y="545" width="1310" height="210" class="orange"/><text x="70" y="580" class="h2">syncd swap is a critical-container transaction</text>
+  <rect x="75" y="615" width="235" height="80" class="green"/><text x="192" y="645" text-anchor="middle" class="b">record normal syncd</text><text x="192" y="671" text-anchor="middle" class="s">image + service health</text>
+  <rect x="360" y="615" width="235" height="80" class="orange"/><text x="477" y="645" text-anchor="middle" class="b">start RPC syncd</text><text x="477" y="671" text-anchor="middle" class="s">verify ASIC + RPC</text>
+  <rect x="645" y="615" width="235" height="80" class="purple"/><text x="762" y="645" text-anchor="middle" class="b">run QoS cases</text><text x="762" y="671" text-anchor="middle" class="s">retain params + evidence</text>
+  <rect x="930" y="615" width="235" height="80" class="orange"/><text x="1047" y="645" text-anchor="middle" class="b">restore normal syncd</text><text x="1047" y="671" text-anchor="middle" class="s">even after partial failure</text>
+  <rect x="1215" y="615" width="110" height="80" class="green"/><text x="1270" y="645" text-anchor="middle" class="b">prove</text><text x="1270" y="671" text-anchor="middle" class="s">SONiC health</text>
+  <path d="M310 655H350" class="line"/><path d="M595 655H635" class="line"/><path d="M880 655H920" class="line"/><path d="M1165 655H1205" class="line"/>
+</svg>

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">Multi-DUT and multi-ASIC ownership coordinate</title>
+  <desc id="desc">A hierarchy from a selected testbed to DUT roles, ASIC namespaces, interfaces, test-server and PTF ownership, with an explicit full coordinate for operations and packets.</desc>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#475569"/></marker>
+    <style>
+      .h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 18px system-ui,sans-serif;fill:#0f172a}
+      .b{font:15px system-ui,sans-serif;fill:#334155}.s{font:13px system-ui,sans-serif;fill:#475569}
+      .p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:16}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:12}
+      .green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:12}.purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:12}
+      .orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:12}.line{stroke:#475569;stroke-width:2.3;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1400" height="820" fill="#fff"/>
+  <text x="55" y="52" class="h1">A port number is not a complete coordinate</text>
+  <text x="55" y="80" class="b">Preserve node role, ASIC namespace, server ownership, and logical role across selection and cleanup.</text>
+
+  <rect x="520" y="115" width="360" height="80" class="blue"/>
+  <text x="700" y="147" text-anchor="middle" class="h2">Selected testbed · DutHosts</text>
+  <text x="700" y="175" text-anchor="middle" class="b">named DUT set + topology roles</text>
+
+  <rect x="110" y="250" width="330" height="120" class="blue"/>
+  <text x="275" y="282" text-anchor="middle" class="h2">Supervisor node</text>
+  <text x="275" y="312" text-anchor="middle" class="b">chassis control-plane services</text>
+  <text x="275" y="340" text-anchor="middle" class="s">global host scope</text>
+  <rect x="535" y="250" width="330" height="120" class="green"/>
+  <text x="700" y="282" text-anchor="middle" class="h2">Frontend node / line card</text>
+  <text x="700" y="312" text-anchor="middle" class="b">front-panel forwarding</text>
+  <text x="700" y="340" text-anchor="middle" class="s">hostname is required identity</text>
+  <rect x="960" y="250" width="330" height="120" class="orange"/>
+  <text x="1125" y="282" text-anchor="middle" class="h2">Peer DUT / second role</text>
+  <text x="1125" y="312" text-anchor="middle" class="b">dual-ToR · T2 · SmartSwitch</text>
+  <text x="1125" y="340" text-anchor="middle" class="s">derive role; do not use list order</text>
+
+  <path d="M700 195V220H275V240" class="line"/>
+  <path d="M700 195V240" class="line"/>
+  <path d="M700 220H1125V240" class="line"/>
+
+  <rect x="400" y="430" width="280" height="115" class="green"/>
+  <text x="540" y="462" text-anchor="middle" class="h2">Frontend ASIC 0</text>
+  <text x="540" y="492" text-anchor="middle" class="b">namespace + interfaces</text>
+  <text x="540" y="520" text-anchor="middle" class="s">routes · ARP · counters</text>
+  <rect x="720" y="430" width="280" height="115" class="green"/>
+  <text x="860" y="462" text-anchor="middle" class="h2">Frontend ASIC N</text>
+  <text x="860" y="492" text-anchor="middle" class="b">independent namespace</text>
+  <text x="860" y="520" text-anchor="middle" class="s">same local names may recur</text>
+  <path d="M700 370V400H540V420" class="line"/><path d="M700 400H860V420" class="line"/>
+
+  <rect x="110" y="610" width="1180" height="145" class="purple"/>
+  <text x="135" y="645" class="h2">Full operation / packet coordinate</text>
+  <text x="140" y="688" class="b">DUT hostname</text><text x="265" y="688" class="s">+</text>
+  <text x="290" y="688" class="b">node role</text><text x="380" y="688" class="s">+</text>
+  <text x="405" y="688" class="b">ASIC namespace</text><text x="545" y="688" class="s">+</text>
+  <text x="570" y="688" class="b">SONiC interface</text><text x="720" y="688" class="s">↔</text>
+  <text x="750" y="688" class="b">server/PTF host</text><text x="890" y="688" class="s">+</text>
+  <text x="915" y="688" class="b">PTF device/port</text><text x="1055" y="688" class="s">+</text>
+  <text x="1080" y="688" class="b">topology role</text>
+  <text x="140" y="723" class="s">Capture original state and restore every successfully mutated coordinate after partial failure.</text>
+  <path d="M540 545V600" class="line"/><path d="M860 545V600" class="line"/>
+</svg>

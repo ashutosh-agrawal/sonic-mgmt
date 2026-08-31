@@ -1,128 +1,193 @@
 # Hands-on virtual lab
 
-This exercise answers a practical question: how do the deployment and test
-lifecycles join together on a small KVM testbed?
+A virtual testbed preserves the logical SONiC test architecture while
+replacing physical DUT/fanout/cable segments with KVM guests, containers,
+Linux interfaces, and OVS. It is ideal for learning because each boundary can
+be inspected on one server, but it is not proof of platform-specific hardware
+behavior.
 
-## Before you begin
+![Deployment gates shared by virtual and physical labs](images/lab-deployment-gates.svg)
 
-Use a Linux test server that meets the KVM testbed prerequisites. You need a
-SONiC virtual-switch image, a supported neighbor image (cEOS is the current
-recommended option in the setup guide), a management inventory, and a
-password file. The commands below create and remove VMs, containers, bridges,
-and DUT configuration. Replace every example name with values from your lab.
+## Documentation basis
 
-Read `docs/testbed/README.testbed.VsSetup.md` completely before provisioning.
-Its image, host-package, and networking requirements are authoritative.
+| Source | Contribution |
+|---|---|
+| [KVM testbed setup][vs-setup] | Host prerequisites, image preparation, inventory/testbed examples, commands, and current cEOS default |
+| [Testbed internals][internals] | VM/container networks, PTF namespace, OVS, veth, VLAN, and backplane details |
+| [Testbed Docker guide][docker] | Container placement and testbed services |
+| `ansible/testbed-cli.sh` and called playbooks | Current operation dispatch |
+| `ansible/vtestbed.yaml`, `veos_vtb`, and topology vars | Example bindings shipped with the repository |
 
-## The deployment model
+Read the complete KVM guide for the branch before provisioning. Image names,
+registries, host packages, and command options change more often than the
+architecture.
 
-```text
-prepare host and images
-        |
-        v
-start neighbor VMs/containers
-        |
-        v
-add-topo: create PTF and connect logical links
-        |
-        v
-deploy-mg: configure the virtual DUT
-        |
-        v
-run one read-only pytest
-        |
-        v
-remove-topo and, when appropriate, stop VMs
-```
+## Placement model
 
-Keep the deployment and test commands separate. A pytest failure does not
-necessarily mean deployment failed, and a successful `add-topo` does not prove
-that the DUT is ready for testing.
+A small virtual T0 commonly places these components on one Linux test server:
 
-## 1. Confirm the selected testbed
+- a virtual SONiC DUT running in KVM;
+- cEOS containers or VM-based routed neighbors;
+- a PTF container;
+- a management bridge;
+- OVS bridges and veth pairs for neighbor-facing links;
+- direct PTF interfaces for modeled servers; and
+- backplane bridges/services for route injection.
 
-From `ansible/`, inspect the `vms-kvm-t0` entry in `vtestbed.yaml`, the DUT name
-in `veos_vtb`, and `vars/topo_t0.yml`. Record the testbed name, DUT hostname,
-server, PTF container, VM base, and topology type.
+The management container or shell running `sonic-mgmt` can be on that server
+or elsewhere, provided inventory and management routing reach every endpoint.
 
-Checkpoint: every hostname resolves from the management container, and the
-selected VM range does not overlap another active topology.
+For `vtestbed`, the current setup guide notes that `add-topo` and
+`remove-topo` also create/remove the KVM DUT and recreate an existing one.
+That is materially destructive to DUT-local state; do not run it against an
+environment another user expects to preserve.
 
-## 2. Start the neighbors
+## Gate 0: reserve and inspect
 
-For a four-neighbor cEOS topology, the setup guide uses:
+Before any command, record:
 
-```bash
+- test server and owner;
+- selected `conf-name`;
+- DUT inventory name;
+- topology variant;
+- PTF/container name;
+- `vm_base` and neighbor count;
+- SONiC and neighbor image versions; and
+- management bridge/subnet.
+
+Inspect the matching entry in `ansible/vtestbed.yaml`, DUT in
+`ansible/veos_vtb`, topology vars, and password/inventory inputs. Confirm the
+VM range does not overlap an active testbed.
+
+**Evidence:** a written allocation and read-only management reachability to the
+server.
+
+## Gate 1: prepare the host and images
+
+Verify CPU virtualization, KVM device access, memory/disk, bridge/network
+configuration, required packages, Docker, and the expected SONiC/neighbor/PTF
+images. The authoritative commands are in [KVM testbed setup][vs-setup].
+
+Do not debug topology YAML while the base image cannot boot or the host cannot
+create a bridge.
+
+**Evidence:** image identifiers/digests, KVM capability, free resources, and
+successful host-level smoke checks.
+
+## Gate 2: start neighbor capacity
+
+For a four-neighbor setup, the guide's command shape is:
+
+```console
 cd ansible
-./testbed-cli.sh -m veos_vtb -n 4 start-vms server_1 password.txt
+./testbed-cli.sh -m veos_vtb -n 4 -k veos +  start-vms server_1 password.txt
 ```
 
-Use `-k veos` or `-k vsonic` only when those are the images you prepared.
+Use `-k vsonic` only for SONiC neighbor images. Current `add-topo` defaults
+to cEOS when `-k` is omitted; follow the exact branch guide and selected
+testbed.
 
-Checkpoint: the neighbor instances exist on the test server and their
-management endpoints are reachable. If this fails, debug the image and test
-server before touching the DUT.
+**Evidence:** expected VM/container instances, management addresses, and no
+collision with another topology.
 
-## 3. Realize the topology
+## Gate 3: realize links and PTF
 
-```bash
-./testbed-cli.sh -t vtestbed.yaml -m veos_vtb add-topo vms-kvm-t0 password.txt
+```console
+./testbed-cli.sh -t vtestbed.yaml -m veos_vtb +  add-topo vms-kvm-t0 password.txt
 ```
 
-`add-topo` creates the PTF environment and virtual connectivity described by
-the testbed entry and topology file. It does not merely start four routers.
+`add-topo` creates the PTF environment and realizes the logical links. It is
+not just “start four routers.”
 
-Checkpoint: the PTF container is running, expected PTF interfaces exist, and
-the virtual bridges or links connect the intended PTF and neighbor endpoints.
+Inspect on the server:
 
-## 4. Configure the DUT
+- PTF container and management `mgmt` interface;
+- expected `ethN` interfaces inside PTF;
+- veth pairs and OVS bridge membership;
+- OVS flows for injected neighbor links;
+- direct host-interface placement;
+- neighbor dataplane interfaces; and
+- backplane bridges/interfaces.
 
-```bash
-./testbed-cli.sh -t vtestbed.yaml -m veos_vtb \
-  deploy-mg vms-kvm-t0 veos_vtb password.txt
+**Evidence:** an endpoint-to-endpoint map for one direct and one injected
+interface.
+
+## Gate 4: generate and deploy DUT configuration
+
+```console
+./testbed-cli.sh -t vtestbed.yaml -m veos_vtb +  deploy-mg vms-kvm-t0 veos_vtb password.txt
 ```
 
-Checkpoint: the DUT is reachable, its minigraph-derived interfaces are up,
-and expected BGP sessions converge. A management connection alone is not a
-dataplane checkpoint.
+`deploy-mg` generates and applies topology-aware DUT configuration.
+`gen-mg` can be used separately when you need to inspect generated output
+before application. Options such as IPv6-only management are branch/workflow
+specific.
 
-## 5. Run one read-only test
+Validate:
 
-From `tests/`, start with the same small fact test used by the maintained setup
-guide:
+- DUT management reachability after reload;
+- active configuration and topology name;
+- interface/admin/oper state;
+- port-channel membership;
+- BGP neighbor state;
+- learned routes; and
+- minigraph PTF indices.
 
-```bash
+**Evidence:** generated configuration plus observed post-deploy facts.
+
+## Gate 5: run progressively
+
+Start with collection and read-only facts before traffic:
+
+```console
+cd ../tests
 ./run_tests.sh -n vms-kvm-t0 -d vlab-01 \
   -c bgp/test_bgp_fact.py -f vtestbed.yaml \
   -i ../ansible/veos_vtb
 ```
 
-Checkpoint: classify any failure as collection, fixture setup, test call,
-teardown, Log Analyzer, or sanity. Save the generated command, logs, and JUnit
-XML before changing the environment.
+Use names and options from your environment. Then:
 
-## 6. Clean up
+1. collect one node ID;
+2. run a read-only management/control-plane check;
+3. run a PTF-agent or simple dataplane smoke test; and
+4. only then run a feature or disruptive suite.
 
-When the environment is no longer needed:
+**Evidence:** command, selected node ID/parameters, logs, result XML, and the
+first packet-path capture if applicable.
 
-```bash
+## Gate 6: remove or hand off
+
+```console
 cd ../ansible
-./testbed-cli.sh -t vtestbed.yaml -m veos_vtb \
-  remove-topo vms-kvm-t0 password.txt
+./testbed-cli.sh -t vtestbed.yaml -m veos_vtb +  remove-topo vms-kvm-t0 password.txt
 ```
 
-Stop shared neighbor VMs only if no other topology uses them. Cleanup is an
-operational decision; do not make that assumption from the example command.
+Stop shared neighbor capacity only when no other topology uses it. Record
+whether the environment was removed, left deployed, or handed to another
+owner. Check for stale containers, bridges, interfaces, and VM allocations.
 
-## Common failures
+## Failure localization
 
-| Symptom | Likely layer |
+| Symptom | First boundary |
 |---|---|
-| VM will not start | image format, KVM support, memory, VM range |
-| `add-topo` fails | testbed entry, bridge state, PTF image, stale topology |
-| DUT unreachable | inventory, management network, credentials, DUT image |
-| BGP does not converge | topology configuration, neighbor type, port mapping |
-| pytest option is unknown | test path ordering or wrong working directory |
-| packet test later fails | PTF indices, interface state, virtual link mapping |
+| DUT/neighbor image will not start | Host capability, image, memory/disk |
+| `add-topo` fails | Testbed binding, stale resources, PTF image, bridge state |
+| Expected PTF `ethN` absent | Topology indices, namespace/interface creation |
+| Neighbor sees no DUT link | OVS membership/flows and link mapping |
+| DUT unreachable after deploy | Generated management config, inventory route |
+| Interfaces up but BGP down | Address/ASN config, neighbor process, OVS link |
+| Control-plane tests pass, packets fail | PTF mapping and virtual dataplane |
+| Virtual passes, hardware fails | Physical/platform behavior outside this model |
 
-Deeper reference: [KVM Testbed Setup](https://github.com/sonic-net/sonic-mgmt/blob/master/docs/testbed/README.testbed.VsSetup.md).
+## What virtual testing cannot establish
+
+KVM/VPP/virtual ASIC and virtual links do not reproduce optics, FEC, cable
+quality, fanout trunks, hardware buffer behavior, SDK/ASIC timing, power
+events, or every reboot path. Use a virtual lab to validate topology,
+management, control logic, and broad forwarding contracts; use hardware for
+hardware claims.
+
+[vs-setup]: https://github.com/sonic-net/sonic-mgmt/blob/master/docs/testbed/README.testbed.VsSetup.md
+[internals]: https://github.com/sonic-net/sonic-mgmt/blob/master/docs/testbed/README.testbed.Internal.md
+[docker]: https://github.com/sonic-net/sonic-mgmt/blob/master/docs/testbed/README.testbed.Docker.md

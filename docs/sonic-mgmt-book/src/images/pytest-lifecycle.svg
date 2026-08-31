@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="720" viewBox="0 0 1400 720" role="img" aria-labelledby="title desc">
+  <title id="title">pytest execution lifecycle in sonic-mgmt</title>
+  <desc id="desc">A timeline from wrapper and collection through fixture setup, test call, teardown, post-checks, and reporting, with failure meanings at each phase.</desc>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#475569"/></marker>
+    <style>
+      .h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 18px system-ui,sans-serif;fill:#0f172a}
+      .b{font:15px system-ui,sans-serif;fill:#334155}.s{font:13px system-ui,sans-serif;fill:#475569}
+      .p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:14}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:12}
+      .purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:12}.green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:12}
+      .orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:12}.red{fill:#fee2e2;stroke:#dc2626;stroke-width:2;rx:12}
+      .line{stroke:#475569;stroke-width:2.5;fill:none;marker-end:url(#a)}.dash{stroke:#64748b;stroke-width:2;stroke-dasharray:7 6;fill:none}
+    </style>
+  </defs>
+  <rect width="1400" height="720" fill="#fff"/>
+  <text x="55" y="52" class="h1">One result spans the whole pytest lifecycle</text>
+  <text x="55" y="80" class="b">The test function is only one phase; collection and teardown can determine the final status.</text>
+
+  <path d="M110 275H1290" class="line"/>
+  <circle cx="130" cy="275" r="8" fill="#2563eb"/><circle cx="350" cy="275" r="8" fill="#7c3aed"/>
+  <circle cx="570" cy="275" r="8" fill="#16a34a"/><circle cx="790" cy="275" r="8" fill="#2563eb"/>
+  <circle cx="1010" cy="275" r="8" fill="#ea580c"/><circle cx="1230" cy="275" r="8" fill="#dc2626"/>
+
+  <rect x="55" y="120" width="150" height="120" class="blue"/>
+  <text x="130" y="151" text-anchor="middle" class="h2">Bootstrap</text>
+  <text x="130" y="179" text-anchor="middle" class="b">run_tests.sh</text>
+  <text x="130" y="202" text-anchor="middle" class="b">options</text>
+  <text x="130" y="225" text-anchor="middle" class="s">plugin registration</text>
+
+  <rect x="260" y="120" width="180" height="120" class="purple"/>
+  <text x="350" y="151" text-anchor="middle" class="h2">Collection</text>
+  <text x="350" y="179" text-anchor="middle" class="b">node expansion</text>
+  <text x="350" y="202" text-anchor="middle" class="b">markers and facts</text>
+  <text x="350" y="225" text-anchor="middle" class="s">skip / xfail / select</text>
+
+  <rect x="480" y="120" width="180" height="120" class="green"/>
+  <text x="570" y="151" text-anchor="middle" class="h2">Setup</text>
+  <text x="570" y="179" text-anchor="middle" class="b">fixture graph</text>
+  <text x="570" y="202" text-anchor="middle" class="b">sanity + mutations</text>
+  <text x="570" y="225" text-anchor="middle" class="s">remote preconditions</text>
+
+  <rect x="700" y="120" width="180" height="120" class="blue"/>
+  <text x="790" y="151" text-anchor="middle" class="h2">Call</text>
+  <text x="790" y="179" text-anchor="middle" class="b">feature operation</text>
+  <text x="790" y="202" text-anchor="middle" class="b">assertions / traffic</text>
+  <text x="790" y="225" text-anchor="middle" class="s">visible test body</text>
+
+  <rect x="920" y="120" width="180" height="120" class="orange"/>
+  <text x="1010" y="151" text-anchor="middle" class="h2">Teardown</text>
+  <text x="1010" y="179" text-anchor="middle" class="b">yield resumes</text>
+  <text x="1010" y="202" text-anchor="middle" class="b">state restoration</text>
+  <text x="1010" y="225" text-anchor="middle" class="s">reverse dependencies</text>
+
+  <rect x="1140" y="120" width="180" height="120" class="red"/>
+  <text x="1230" y="151" text-anchor="middle" class="h2">Post/report</text>
+  <text x="1230" y="179" text-anchor="middle" class="b">logs + sanity</text>
+  <text x="1230" y="202" text-anchor="middle" class="b">JUnit / Allure</text>
+  <text x="1230" y="225" text-anchor="middle" class="s">final outcome</text>
+
+  <rect x="55" y="330" width="1265" height="110" class="p"/>
+  <text x="80" y="362" class="h2">Auto-used and shared behavior</text>
+  <rect x="260" y="382" width="180" height="36" class="purple"/><text x="350" y="405" text-anchor="middle" class="s">conditional marks</text>
+  <rect x="480" y="382" width="400" height="36" class="green"/><text x="680" y="405" text-anchor="middle" class="s">pre-sanity · log markers · monitors · feature fixtures</text>
+  <rect x="920" y="382" width="400" height="36" class="orange"/><text x="1120" y="405" text-anchor="middle" class="s">finalizers · log analysis · post-sanity · artifact hooks</text>
+
+  <rect x="55" y="475" width="1265" height="185" class="p"/>
+  <text x="80" y="507" class="h2">Meaning of the earliest failure</text>
+  <text x="80" y="542" class="b">Bootstrap</text><text x="190" y="542" class="s">option, import, inventory, or plugin initialization</text>
+  <text x="80" y="573" class="b">Collection</text><text x="190" y="573" class="s">selection or parameterization; test call did not run</text>
+  <text x="80" y="604" class="b">Setup</text><text x="190" y="604" class="s">precondition or fixture failure; restore prior successful setup</text>
+  <text x="700" y="542" class="b">Call</text><text x="785" y="542" class="s">feature operation, assertion, or packet path</text>
+  <text x="700" y="573" class="b">Teardown</text><text x="785" y="573" class="s">restoration defect; lab may be unsafe for later tests</text>
+  <text x="700" y="604" class="b">Post/report</text><text x="785" y="604" class="s">unexpected logs, health regression, or missing evidence</text>
+  <path d="M80 625H1285" class="dash"/>
+  <text x="80" y="648" class="s">A passing assertion is not a passing node until teardown and plugin post-checks finish.</text>
+</svg>

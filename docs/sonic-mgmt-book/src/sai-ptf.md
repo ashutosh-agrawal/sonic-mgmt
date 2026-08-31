@@ -1,56 +1,151 @@
 # SAI and PTF testing
 
-“PTF test” names an execution mechanism; “SAI test” names the interface under
-test. They overlap, but they are not synonyms.
+“PTF” identifies a packet-test mechanism. “SAI” identifies the API boundary
+under test. A normal SONiC pytest can use PTF end to end, while a SAI
+qualification workflow intentionally replaces normal SONiC forwarding
+services and drives vendor SAI through RPC.
 
-## Three useful layers
+![End-to-end SONiC PTF and direct SAI qualification boundaries](images/sai-boundaries.svg)
 
-1. A normal sonic-mgmt pytest may use PTF to validate end-to-end SONiC
-   behavior.
-2. `tests/saitests/` contains PTF-side SAI-oriented tests and probing support.
-3. SAI qualification workflows replace normal syncd with `saiserver`, install
-   matching thrift bindings, and exercise SAI through RPC.
+## Documentation basis
 
-The third mode intentionally bypasses part of the normal SONiC orchestration
-path. Its result should not be interpreted as an end-to-end SONiC feature test.
+| Source | Contribution |
+|---|---|
+| [SAI quality README][sai-quality] | Workflow index and compatibility emphasis |
+| [PTF-SAIv2 testing guide][ptf-saiv2] | SAI/PTF environment, branch/version relationships, client/server behavior |
+| [Deploy SAI test topology][deploy-sai] | SONiC-mgmt testbed and container deployment example |
+| `tests/sai_qualify/` | Current pytest orchestration of SAI suites |
+| `tests/saitests/` | PTF-side SAI test code retained in this repository |
+| `tests/scripts/sai_qualify/` | DUT service/container preparation and restoration scripts |
+| `ansible/swap_syncd.yml` | RPC syncd swap used by some workflows |
 
-## SAI-server boundary
+The SAI quality documents are operational guides tied to particular branches,
+images, vendors, and tool revisions. Follow the matching branch rather than
+combining commands from different snapshots.
+
+## Three distinct test layers
+
+### 1. End-to-end SONiC feature test
 
 ```text
-pytest / test harness
-  -> PTF SAI test and thrift client
-  -> saiserver or RPC-capable syncd on DUT
-  -> vendor SAI
-  -> ASIC or virtual dataplane
+pytest -> PTF packet -> SONiC ports
+       -> orchagent / syncd / SAI -> ASIC
 ```
 
-Client bindings, SAI headers, server image, SONiC branch, and vendor SDK must be
-compatible. A transport connection can succeed while method or attribute
-versions are incompatible.
+The test validates SONiC behavior through its normal control and forwarding
+stack. PTF is only the traffic endpoint.
 
-## Deployment and restoration
+### 2. QoS or helper test using RPC syncd
 
-The repository includes `ansible/roles/test/tasks/saiserver.yml`, SAI-quality
-scripts, and `ansible/swap_syncd.yml`. Before swapping containers, record the
-default syncd image and service state. After testing, restore normal syncd and
-run a health check; leaving saiserver active contaminates later SONiC tests.
+Some suites swap normal syncd for an RPC-capable variant while retaining more
+of the SONiC test context. The exact bypass depends on the image/service.
 
-## Evidence to preserve
+### 3. Direct SAI qualification
 
-- exact SONiC image and SAI header version;
-- saiserver/syncd image identity;
-- thrift package or client revision;
-- PTF test case and parameters;
-- RPC error or SAI status code;
-- ASIC and sairedis logs;
-- restoration and post-test health results.
+```text
+pytest/qualification harness
+  -> PTF SAI test + thrift client
+  -> saiserverv2 on DUT
+  -> vendor SAI
+  -> ASIC / virtual dataplane
+```
 
-## Exercise
+The direct path bypasses normal orchagent behavior. A pass demonstrates the
+SAI/server/ASIC contract exercised by that case, not end-to-end SONiC feature
+correctness.
 
-Take one test under `tests/saitests/`. Identify whether it expects a normal
-syncd, RPC syncd, or saiserver environment. Trace how it is copied to PTF, how
-its client reaches the DUT, and which script restores the DUT afterward.
+## Compatibility is a matrix
 
-Deeper references: [SAI quality guide](https://github.com/sonic-net/sonic-mgmt/tree/master/docs/testbed/sai_quality),
-[PTF SAIv2 testing guide](https://github.com/sonic-net/sonic-mgmt/blob/master/docs/testbed/sai_quality/PTF-SAIv2TestingGuide.md),
-and [SAI tests](https://github.com/sonic-net/sonic-mgmt/tree/master/tests/saitests).
+The following must agree:
+
+- SAI API/header revision;
+- PTF-SAI test branch/revision;
+- generated thrift client bindings;
+- saiserver or RPC-syncd image;
+- SONiC branch/build and vendor SDK;
+- Python/PTF runtime; and
+- vendor/platform capabilities.
+
+Exact matches may be required. A TCP connection to the RPC port proves
+transport only; method IDs, attributes, enum values, and object behavior can
+still be incompatible.
+
+Record all revisions and image digests in the result.
+
+## Direct saiserver workflow
+
+The documented PTF-SAIv2 example uses a PTF/non-topology-style environment, a
+PTF-SAI container on the test side, and `saiserverv2` on the DUT. An example
+thrift endpoint uses TCP port 9092. Treat address/port as deployment data, not
+a universal constant.
+
+A safe high-level sequence is:
+
+1. reserve DUT/PTF and prove console/recovery access;
+2. record normal SONiC image, syncd/swss/container state, and config;
+3. verify the compatibility matrix;
+4. copy/install the matching PTF-SAI client/tests;
+5. stop normal services required by the guide, commonly swss/syncd for direct
+   saiserver ownership;
+6. start the exact saiserver image and verify initialization/logs/RPC;
+7. run one non-destructive API smoke operation;
+8. execute selected SAI cases and collect status/log/capture evidence;
+9. stop saiserver and restore normal services/containers; and
+10. run SONiC health and forwarding checks.
+
+Stopping swss/syncd is intentional in direct mode because two owners must not
+program the ASIC simultaneously.
+
+## Test result semantics
+
+A SAI operation can fail at:
+
+| Boundary | Evidence |
+|---|---|
+| RPC transport | Connection/refusal/timeout |
+| Thrift/API compatibility | Unknown method, serialization, invalid attribute |
+| SAI validation | Returned SAI status |
+| Vendor implementation | saiserver/SDK logs, crash, unsupported behavior |
+| ASIC/dataplane | Packet/counter/state mismatch |
+| Test expectation | Incorrect object lifecycle or capability assumption |
+
+Preserve the numeric/symbolic SAI status and the exact call parameters. A
+generic Python exception loses the most useful qualification evidence.
+
+## PTF data path and port mapping
+
+Direct SAI tests still need correct PTF-to-DUT port identity. Depending on the
+topology and server mode, this may be a direct PTF mapping without routed
+neighbor VMs. Record DUT port, SAI port object/attribute mapping, PTF
+device/port, and ASIC ownership.
+
+Do not import a minigraph mapping assumption from a normal SONiC test if the
+saiserver workflow rebuilt or bypassed configuration differently.
+
+## Restoration is part of qualification
+
+After testing, verify:
+
+- saiserver stopped;
+- normal syncd/swss/container images and services restored;
+- Config DB/minigraph baseline restored as intended;
+- critical processes and ASIC initialization healthy;
+- management and front-panel interfaces up;
+- a normal end-to-end SONiC packet smoke test passes; and
+- no RPC tunnel/process remains.
+
+If restoration fails, quarantine the testbed. A direct SAI environment can
+make later SONiC failures meaningless.
+
+## Review checklist
+
+- Which of the three layers is actually under test?
+- Is the full compatibility matrix immutable and recorded?
+- Which normal SONiC services are intentionally bypassed?
+- Is the RPC endpoint and PTF port mapping explicit?
+- Are SAI status, saiserver/SDK logs, and packet evidence retained?
+- Does cleanup prove normal SONiC forwarding, not only container presence?
+
+[sai-quality]: https://github.com/sonic-net/sonic-mgmt/blob/master/docs/testbed/sai_quality/README.md
+[ptf-saiv2]: https://github.com/sonic-net/sonic-mgmt/blob/master/docs/testbed/sai_quality/PTF-SAIv2TestingGuide.md
+[deploy-sai]: https://github.com/sonic-net/sonic-mgmt/blob/master/docs/testbed/sai_quality/DeploySAITestTopologyWithSONiC-MGMT.md

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1000" viewBox="0 0 1400 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Anatomy of topo_t0-8.yml</title>
+  <desc id="desc">The topology section defines four neighbor links and four direct host links, configuration properties provide shared values, per-neighbor configuration adds protocols, and a testbed entry binds the shape to concrete resources.</desc>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#475569"/></marker>
+    <style>
+      .h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 18px system-ui,sans-serif;fill:#0f172a}
+      .b{font:15px system-ui,sans-serif;fill:#334155}.s{font:13px system-ui,sans-serif;fill:#475569}.m{font:14px ui-monospace,monospace;fill:#1e293b}
+      .p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:16}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:12}
+      .green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:12}.purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:12}
+      .orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:12}.line{stroke:#475569;stroke-width:2.3;fill:none;marker-end:url(#a)}
+      .dash{stroke:#64748b;stroke-width:2;stroke-dasharray:7 6;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1400" height="1000" fill="#fff"/>
+  <text x="55" y="52" class="h1">topo_t0-8.yml declares shape, then protocol configuration</text>
+  <text x="55" y="80" class="b">Concrete DUTs, VM numbers, server placement, and physical links are bound later.</text>
+
+  <rect x="45" y="110" width="800" height="470" class="p"/>
+  <text x="70" y="145" class="h2">topology</text>
+  <rect x="75" y="175" width="330" height="150" class="purple"/>
+  <text x="240" y="205" text-anchor="middle" class="h2">VM links · indices 0–3</text>
+  <text x="100" y="242" class="m">ARISTA01T1  vlan 0  offset 0</text>
+  <text x="100" y="270" class="m">ARISTA02T1  vlan 1  offset 1</text>
+  <text x="100" y="298" class="s">+ ARISTA03T1 and ARISTA04T1</text>
+  <rect x="455" y="175" width="350" height="150" class="green"/>
+  <text x="630" y="205" text-anchor="middle" class="h2">host_interfaces · indices 4–7</text>
+  <text x="490" y="245" class="m">[4, 5, 6, 7]</text>
+  <text x="490" y="274" class="b">direct modeled server links</text>
+  <text x="490" y="302" class="s">no routed neighbor endpoint</text>
+  <rect x="75" y="370" width="730" height="155" class="blue"/>
+  <text x="100" y="402" class="h2">DUT.vlan_configs</text>
+  <text x="110" y="438" class="m">Vlan1000  intfs [4,5,6,7]</text>
+  <text x="110" y="469" class="m">192.168.0.1/21  ·  fc02:1000::1/64</text>
+  <text x="110" y="503" class="s">Logical host indices become VLAN members; they are not literal Ethernet numbers.</text>
+
+  <rect x="885" y="110" width="470" height="220" class="p"/>
+  <text x="910" y="145" class="h2">configuration_properties.common</text>
+  <rect x="915" y="175" width="410" height="120" class="blue"/>
+  <text x="940" y="207" class="b">DUT ASN · switch role · address allocation</text>
+  <text x="940" y="239" class="b">neighbor ASN range · route next hops</text>
+  <text x="940" y="272" class="s">Reusable inputs only when a consumer references them</text>
+
+  <rect x="885" y="360" width="470" height="220" class="p"/>
+  <text x="910" y="395" class="h2">configuration per neighbor</text>
+  <rect x="915" y="425" width="410" height="120" class="purple"/>
+  <text x="940" y="457" class="b">BGP ASN + DUT peer addresses</text>
+  <text x="940" y="489" class="b">loopback · port-channel · LACP</text>
+  <text x="940" y="521" class="b">independent backplane interface</text>
+  <path d="M1120 330V350" class="line"/>
+
+  <rect x="45" y="625" width="1310" height="325" class="orange"/>
+  <text x="70" y="660" class="h2">Binding and deployment add concrete identity</text>
+  <rect x="75" y="690" width="240" height="95" class="blue"/>
+  <text x="195" y="718" text-anchor="middle" class="h2">testbed entry</text>
+  <text x="195" y="746" text-anchor="middle" class="b">DUT · server · PTF</text>
+  <text x="195" y="770" text-anchor="middle" class="s">vm_base · topology name</text>
+  <rect x="365" y="690" width="240" height="95" class="blue"/>
+  <text x="485" y="718" text-anchor="middle" class="h2">inventory</text>
+  <text x="485" y="746" text-anchor="middle" class="b">addresses · groups</text>
+  <text x="485" y="770" text-anchor="middle" class="s">connection variables</text>
+  <rect x="655" y="690" width="240" height="95" class="orange"/>
+  <text x="775" y="718" text-anchor="middle" class="h2">connection graph</text>
+  <text x="775" y="746" text-anchor="middle" class="b">fanout · cable · VLAN</text>
+  <text x="775" y="770" text-anchor="middle" class="s">physical labs</text>
+  <rect x="825" y="825" width="220" height="90" class="purple"/>
+  <text x="935" y="855" text-anchor="middle" class="h2">deployment</text>
+  <text x="935" y="882" text-anchor="middle" class="b">realize + configure</text>
+  <text x="935" y="904" text-anchor="middle" class="s">roles and playbooks</text>
+  <rect x="1100" y="825" width="225" height="90" class="green"/>
+  <text x="1212" y="855" text-anchor="middle" class="h2">live facts</text>
+  <text x="1212" y="882" text-anchor="middle" class="b">DUT interface</text>
+  <text x="1212" y="904" text-anchor="middle" class="b">PTF index · ASIC</text>
+  <path d="M445 580V610H195V680" class="line"/>
+  <path d="M1120 580V805H935V815" class="line"/>
+  <path d="M195 785V805H935V815" class="line"/>
+  <path d="M485 785V805H935V815" class="line"/>
+  <path d="M775 785V805H935V815" class="line"/>
+  <path d="M1045 870H1090" class="line"/>
+</svg>

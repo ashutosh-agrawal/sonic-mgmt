@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
+  <title id="title">Question-driven sonic-mgmt repository navigation</title>
+  <desc id="desc">Four vertical reading paths connect test selection, host objects, packet execution, and deployment across specific repository entry points, all joined by an evidence and cleanup layer.</desc>
+  <defs><marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#475569"/></marker>
+    <style>.h1{font:700 30px system-ui,sans-serif;fill:#0f172a}.h2{font:700 18px system-ui,sans-serif;fill:#0f172a}.b{font:14px system-ui,sans-serif;fill:#334155}.s{font:12px system-ui,sans-serif;fill:#475569}.m{font:13px ui-monospace,monospace;fill:#1e293b}.p{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:16}.blue{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:10}.green{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:10}.purple{fill:#ede9fe;stroke:#7c3aed;stroke-width:2;rx:10}.orange{fill:#ffedd5;stroke:#ea580c;stroke-width:2;rx:10}.line{stroke:#475569;stroke-width:2.2;fill:none;marker-end:url(#a)}</style>
+  </defs>
+  <rect width="1400" height="900" fill="#fff"/><text x="55" y="52" class="h1">Navigate by runtime question, not directory order</text><text x="55" y="80" class="b">Each vertical slice crosses the files that own selection, control, realization, and evidence.</text>
+  <rect x="45" y="115" width="300" height="625" class="purple"/><text x="70" y="150" class="h2">Why was this item selected?</text>
+  <rect x="75" y="185" width="240" height="70" class="purple"/><text x="195" y="215" text-anchor="middle" class="m">tests/run_tests.sh</text><text x="195" y="239" text-anchor="middle" class="s">resolved pytest command</text>
+  <rect x="75" y="295" width="240" height="80" class="purple"/><text x="195" y="324" text-anchor="middle" class="m">tests/conftest.py</text><text x="195" y="348" text-anchor="middle" class="s">options · generate · collect</text>
+  <rect x="75" y="415" width="240" height="80" class="purple"/><text x="195" y="444" text-anchor="middle" class="m">feature/conftest.py</text><text x="195" y="468" text-anchor="middle" class="s">local fixtures/options</text>
+  <rect x="75" y="535" width="240" height="80" class="purple"/><text x="195" y="564" text-anchor="middle" class="m">common/plugins/</text><text x="195" y="588" text-anchor="middle" class="s">marks · completeness</text>
+  <text x="195" y="690" text-anchor="middle" class="b">Output</text><text x="195" y="716" text-anchor="middle" class="s">node ID + params + marks</text>
+  <path d="M195 255V285" class="line"/><path d="M195 375V405" class="line"/><path d="M195 495V525" class="line"/>
+
+  <rect x="380" y="115" width="300" height="625" class="blue"/><text x="405" y="150" class="h2">What does this host call do?</text>
+  <rect x="410" y="185" width="240" height="70" class="blue"/><text x="530" y="215" text-anchor="middle" class="m">fixture definition</text><text x="530" y="239" text-anchor="middle" class="s">selection + scope</text>
+  <rect x="410" y="295" width="240" height="80" class="blue"/><text x="530" y="324" text-anchor="middle" class="m">devices/base.py</text><text x="530" y="348" text-anchor="middle" class="s">AnsibleHostBase dispatch</text>
+  <rect x="410" y="415" width="240" height="80" class="blue"/><text x="530" y="444" text-anchor="middle" class="m">sonic*.py / ptf.py</text><text x="530" y="468" text-anchor="middle" class="s">helper + namespace</text>
+  <rect x="410" y="535" width="240" height="80" class="blue"/><text x="530" y="564" text-anchor="middle" class="m">module / remote script</text><text x="530" y="588" text-anchor="middle" class="s">effect + return contract</text>
+  <text x="530" y="690" text-anchor="middle" class="b">Output</text><text x="530" y="716" text-anchor="middle" class="s">target + effect + result</text>
+  <path d="M530 255V285" class="line"/><path d="M530 375V405" class="line"/><path d="M530 495V525" class="line"/>
+
+  <rect x="715" y="115" width="300" height="625" class="green"/><text x="740" y="150" class="h2">Where did this packet go?</text>
+  <rect x="745" y="185" width="240" height="70" class="green"/><text x="865" y="215" text-anchor="middle" class="m">test packet call</text><text x="865" y="239" text-anchor="middle" class="s">adapter or runner mode</text>
+  <rect x="745" y="295" width="240" height="80" class="green"/><text x="865" y="324" text-anchor="middle" class="m">ptfadapter / ptf_runner</text><text x="865" y="348" text-anchor="middle" class="s">remote process boundary</text>
+  <rect x="745" y="415" width="240" height="80" class="green"/><text x="865" y="444" text-anchor="middle" class="m">tbinfo + minigraph</text><text x="865" y="468" text-anchor="middle" class="s">PTF ↔ DUT index map</text>
+  <rect x="745" y="535" width="240" height="80" class="green"/><text x="865" y="564" text-anchor="middle" class="m">namespace / OVS / graph</text><text x="865" y="588" text-anchor="middle" class="s">realized dataplane</text>
+  <text x="865" y="690" text-anchor="middle" class="b">Output</text><text x="865" y="716" text-anchor="middle" class="s">capture points + ownership</text>
+  <path d="M865 255V285" class="line"/><path d="M865 375V405" class="line"/><path d="M865 495V525" class="line"/>
+
+  <rect x="1050" y="115" width="305" height="625" class="orange"/><text x="1075" y="150" class="h2">How was the lab created?</text>
+  <rect x="1080" y="185" width="245" height="70" class="orange"/><text x="1202" y="215" text-anchor="middle" class="m">testbed-cli.sh</text><text x="1202" y="239" text-anchor="middle" class="s">operation dispatch</text>
+  <rect x="1080" y="295" width="245" height="80" class="orange"/><text x="1202" y="324" text-anchor="middle" class="m">testbed/topology vars</text><text x="1202" y="348" text-anchor="middle" class="s">declared inputs</text>
+  <rect x="1080" y="415" width="245" height="80" class="orange"/><text x="1202" y="444" text-anchor="middle" class="m">playbooks / roles</text><text x="1202" y="468" text-anchor="middle" class="s">created resources</text>
+  <rect x="1080" y="535" width="245" height="80" class="orange"/><text x="1202" y="564" text-anchor="middle" class="m">live server + DUT state</text><text x="1202" y="588" text-anchor="middle" class="s">observed deployment</text>
+  <text x="1202" y="690" text-anchor="middle" class="b">Output</text><text x="1202" y="716" text-anchor="middle" class="s">resource map + acceptance</text>
+  <path d="M1202 255V285" class="line"/><path d="M1202 375V405" class="line"/><path d="M1202 495V525" class="line"/>
+
+  <rect x="45" y="780" width="1310" height="75" class="p"/><text x="70" y="811" class="h2">Join every slice with</text><text x="270" y="811" class="b">source ownership</text><text x="440" y="811" class="s">+</text><text x="470" y="811" class="b">failure boundary</text><text x="650" y="811" class="s">+</text><text x="680" y="811" class="b">cleanup owner</text><text x="830" y="811" class="s">+</text><text x="860" y="811" class="b">CI artifact</text><text x="990" y="811" class="s">+</text><text x="1020" y="811" class="b">all callers</text>
+</svg>
