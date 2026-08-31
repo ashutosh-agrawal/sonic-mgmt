@@ -1,0 +1,14 @@
+[book]
+title = "Understanding sonic-mgmt"
+authors = ["SONiC community"]
+description = "A learner-first guide to SONiC testbeds, topologies, and tests"
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+create-missing = false
+
+[output.html]
+git-repository-url = "https://github.com/sonic-net/sonic-mgmt"
+edit-url-template = "https://github.com/sonic-net/sonic-mgmt/edit/master/docs/sonic-mgmt-book/{path}"

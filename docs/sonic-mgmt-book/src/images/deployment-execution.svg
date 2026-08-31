@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
+  <title id="title">Deployment and test execution lifecycles</title>
+  <desc id="desc">Configuration inputs feed testbed-cli and Ansible to deploy PTF, neighbors, OVS, VLANs, fanouts, and DUT configuration. Separately, run_tests and pytest resolve the selected testbed into fixtures and remote host objects that operate the already deployed environment.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+    <style>
+      .bg{fill:#fff}.inputs{fill:#f1f5f9;stroke:#475569;stroke-width:2}.deploy{fill:#fff7ed;stroke:#d97706;stroke-width:2}.execute{fill:#eff6ff;stroke:#2563eb;stroke-width:2}.runtime{fill:#ecfdf5;stroke:#059669;stroke-width:2}.zone{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2}
+      .title{font:700 30px system-ui,sans-serif;fill:#0f172a}.subtitle{font:16px system-ui,sans-serif;fill:#475569}.head{font:700 21px system-ui,sans-serif;fill:#0f172a}.label{font:600 15px system-ui,sans-serif;fill:#1e293b}.small{font:13px system-ui,sans-serif;fill:#475569}.note{font:15px system-ui,sans-serif;fill:#334155}.step{font:700 14px system-ui,sans-serif;fill:#fff}
+      .gray{fill:none;stroke:#475569;stroke-width:3;marker-end:url(#arrow);color:#475569}.orange{fill:none;stroke:#d97706;stroke-width:4;marker-end:url(#arrow);color:#d97706}.blue{fill:none;stroke:#2563eb;stroke-width:4;marker-end:url(#arrow);color:#2563eb}.green{fill:none;stroke:#059669;stroke-width:3;marker-end:url(#arrow);color:#059669}.dash{stroke-dasharray:9 7}
+    </style>
+  </defs>
+  <rect width="1400" height="900" class="bg"/>
+  <text x="40" y="45" class="title">Deployment builds the environment; pytest consumes it</text>
+  <text x="40" y="73" class="subtitle">The two lifecycles share descriptions and targets, but topology selection during pytest does not run deployment.</text>
+
+  <rect x="40" y="110" width="280" height="675" rx="14" class="zone"/>
+  <text x="65" y="145" class="head">Description inputs</text>
+  <rect x="70" y="180" width="220" height="70" rx="8" class="inputs"/><text x="105" y="210" class="label">Inventory + group vars</text><text x="110" y="233" class="small">hosts, IPs, credentials</text>
+  <rect x="70" y="280" width="220" height="70" rx="8" class="inputs"/><text x="112" y="310" class="label">testbed.yaml entry</text><text x="98" y="333" class="small">DUT, server, PTF, topo</text>
+  <rect x="70" y="380" width="220" height="70" rx="8" class="inputs"/><text x="106" y="410" class="label">topo_&lt;name&gt;.yml</text><text x="107" y="433" class="small">logical links and peers</text>
+  <rect x="70" y="480" width="220" height="70" rx="8" class="inputs"/><text x="106" y="510" class="label">Connection graph</text><text x="95" y="533" class="small">cables, fanouts, VLAN IDs</text>
+  <rect x="70" y="580" width="220" height="70" rx="8" class="inputs"/><text x="111" y="610" class="label">DUT/runtime facts</text><text x="102" y="633" class="small">observed after deployment</text>
+  <text x="69" y="704" class="small">Declared state is split across files.</text><text x="69" y="727" class="small">Observed state comes from live systems.</text>
+
+  <rect x="365" y="110" width="455" height="675" rx="14" class="zone"/>
+  <text x="390" y="145" class="head">A. Deployment lifecycle</text>
+  <rect x="420" y="190" width="345" height="75" rx="9" class="deploy"/><text x="491" y="221" class="label">testbed-cli.sh subcommand</text><text x="456" y="246" class="small">start-topo-vms • add-topo • gen/deploy-mg</text>
+  <rect x="420" y="320" width="345" height="75" rx="9" class="deploy"/><text x="488" y="351" class="label">Ansible playbooks + roles</text><text x="463" y="376" class="small">resolve variables and mutate remote state</text>
+  <rect x="405" y="470" width="155" height="75" rx="9" class="runtime"/><text x="440" y="501" class="label">Test server</text><text x="433" y="526" class="small">PTF / VM / OVS</text>
+  <rect x="625" y="470" width="155" height="75" rx="9" class="runtime"/><text x="663" y="501" class="label">Fanouts</text><text x="651" y="526" class="small">VLAN / trunks</text>
+  <rect x="405" y="605" width="155" height="75" rx="9" class="runtime"/><text x="462" y="636" class="label">DUT</text><text x="427" y="661" class="small">minigraph/config</text>
+  <rect x="625" y="605" width="155" height="75" rx="9" class="runtime"/><text x="647" y="636" class="label">Neighbors</text><text x="642" y="661" class="small">NOS configuration</text>
+  <path d="M320 315H420M320 415H390V227H420M320 515H365V357H420" class="orange"/>
+  <path d="M592 265V320M592 395V435L482 470M592 435L702 470M592 435L482 605M592 435L702 605" class="orange"/>
+  <text x="422" y="740" class="note">Output: a concrete, running testbed.</text>
+
+  <rect x="865" y="110" width="495" height="675" rx="14" class="zone"/>
+  <text x="890" y="145" class="head">B. Test-execution lifecycle</text>
+  <rect x="925" y="190" width="375" height="75" rx="9" class="execute"/><text x="1017" y="221" class="label">run_tests.sh</text><text x="969" y="246" class="small">builds supported pytest arguments and logs</text>
+  <rect x="925" y="320" width="375" height="75" rx="9" class="execute"/><text x="1041" y="351" class="label">pytest</text><text x="962" y="376" class="small">collection • markers • plugins • fixture scopes</text>
+  <rect x="925" y="450" width="375" height="95" rx="9" class="execute"/><text x="1001" y="482" class="label">tbinfo + remote host objects</text><text x="948" y="507" class="small">duthosts • ptfhosts • nbrhosts • fanouthosts</text><text x="998" y="530" class="small">local proxies, remote work</text>
+  <rect x="925" y="620" width="375" height="75" rx="9" class="runtime"/><text x="995" y="651" class="label">Already deployed testbed</text><text x="963" y="676" class="small">configure • observe • send • assert • clean up</text>
+  <path d="M820 315H885V227H925M820 415H900V357H925M820 615H885V497H925" class="blue"/>
+  <path d="M1112 265V320M1112 395V450M1112 545V620" class="blue"/>
+  <path d="M925 657C855 657 835 725 780 680" class="green dash"/>
+  <text x="922" y="740" class="note">Input: the environment deployment produced.</text>
+
+  <rect x="40" y="820" width="1320" height="55" rx="9" fill="#fff7ed" stroke="#d97706"/>
+  <text x="65" y="854" class="note">A topology marker controls compatibility and selection. It does not create PTF, OVS bridges, VMs, fanout VLANs, or DUT configuration.</text>
+</svg>

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">Foundational sonic-mgmt logical topology families</title>
+  <desc id="desc">T0 has upstream T1 neighbor VMs and downstream PTF server links. T1 has upstream T2 and downstream T0 neighbor VMs with PTF injected into their paths. PTF topology connects all DUT ports to PTF. PTP directly connects two DUTs.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+    <style>
+      .bg{fill:#fff}.panel{fill:#f8fafc;stroke:#94a3b8;stroke-width:2}.dut{fill:#eff6ff;stroke:#2563eb;stroke-width:2}.nbr{fill:#f5f3ff;stroke:#7c3aed;stroke-width:2}.ptf{fill:#ecfdf5;stroke:#059669;stroke-width:2}
+      .title{font:700 30px system-ui,sans-serif;fill:#0f172a}.subtitle{font:16px system-ui,sans-serif;fill:#475569}.head{font:700 22px system-ui,sans-serif;fill:#0f172a}.label{font:600 15px system-ui,sans-serif;fill:#1e293b}.small{font:13px system-ui,sans-serif;fill:#475569}.note{font:15px system-ui,sans-serif;fill:#334155}
+      .link{fill:none;stroke:#475569;stroke-width:3}.inject{fill:none;stroke:#059669;stroke-width:3;stroke-dasharray:9 7;marker-end:url(#arrow);color:#059669}
+    </style>
+  </defs>
+  <rect width="1400" height="820" class="bg"/>
+  <text x="40" y="45" class="title">Logical topology changes port roles, not the installed cabling</text>
+  <text x="40" y="73" class="subtitle">Solid lines are modeled network links. Dashed green lines are PTF injection/capture access to a modeled link.</text>
+
+  <rect x="40" y="105" width="640" height="315" rx="14" class="panel"/>
+  <text x="65" y="140" class="head">T0 — DUT models a top-of-rack switch</text>
+  <rect x="95" y="180" width="140" height="55" rx="8" class="nbr"/><text x="118" y="213" class="label">T1 neighbor VM</text>
+  <rect x="270" y="180" width="140" height="55" rx="8" class="nbr"/><text x="293" y="213" class="label">T1 neighbor VM</text>
+  <rect x="205" y="285" width="180" height="65" rx="8" class="dut"/><text x="270" y="313" class="label">DUT</text><text x="264" y="335" class="small">T0 role</text>
+  <rect x="465" y="270" width="155" height="80" rx="8" class="ptf"/><text x="515" y="301" class="label">PTF</text><text x="486" y="325" class="small">downstream servers</text>
+  <path d="M165 235L240 285M340 235L350 285M385 317H465" class="link"/>
+  <path d="M520 270C490 205 410 205 410 235" class="inject"/>
+  <text x="82" y="393" class="note">Direct PTF ports model servers; injected ports observe and inject on neighbor links.</text>
+
+  <rect x="720" y="105" width="640" height="315" rx="14" class="panel"/>
+  <text x="745" y="140" class="head">T1 — both sides are routed neighbor devices</text>
+  <rect x="775" y="175" width="140" height="55" rx="8" class="nbr"/><text x="800" y="208" class="label">T2 neighbor VM</text>
+  <rect x="950" y="175" width="140" height="55" rx="8" class="nbr"/><text x="975" y="208" class="label">T2 neighbor VM</text>
+  <rect x="860" y="275" width="180" height="65" rx="8" class="dut"/><text x="925" y="303" class="label">DUT</text><text x="920" y="325" class="small">T1 role</text>
+  <rect x="775" y="355" width="140" height="45" rx="8" class="nbr"/><text x="800" y="383" class="label">T0 neighbor</text>
+  <rect x="950" y="355" width="140" height="45" rx="8" class="nbr"/><text x="975" y="383" class="label">T0 neighbor</text>
+  <rect x="1160" y="255" width="145" height="75" rx="8" class="ptf"/><text x="1206" y="285" class="label">PTF</text><text x="1178" y="309" class="small">injected ports only</text>
+  <path d="M845 230L900 275M1020 230L1000 275M900 340L845 355M1000 340L1020 355" class="link"/>
+  <path d="M1160 275L1040 293M1160 310L1040 320" class="inject"/>
+
+  <rect x="40" y="455" width="640" height="315" rx="14" class="panel"/>
+  <text x="65" y="490" class="head">PTF — every selected DUT port is a traffic port</text>
+  <rect x="105" y="560" width="190" height="80" rx="8" class="ptf"/><text x="165" y="594" class="label">PTF</text><text x="130" y="619" class="small">eth0 … ethN</text>
+  <rect x="425" y="560" width="190" height="80" rx="8" class="dut"/><text x="493" y="594" class="label">DUT</text><text x="454" y="619" class="small">port 0 … port N</text>
+  <path d="M295 575H425M295 592H425M295 609H425M295 626H425" class="link"/>
+  <text x="95" y="700" class="note">No routed neighbor VMs and no injected PTF ports are required.</text>
+
+  <rect x="720" y="455" width="640" height="315" rx="14" class="panel"/>
+  <text x="745" y="490" class="head">PTP — direct DUT-to-DUT link testing</text>
+  <rect x="800" y="560" width="190" height="80" rx="8" class="dut"/><text x="855" y="594" class="label">DUT 1</text><text x="827" y="619" class="small">ports 1 … N</text>
+  <rect x="1090" y="560" width="190" height="80" rx="8" class="dut"/><text x="1145" y="594" class="label">DUT 2</text><text x="1117" y="619" class="small">ports 1 … N</text>
+  <path d="M990 575H1090M990 592H1090M990 609H1090M990 626H1090" class="link"/>
+  <text x="805" y="700" class="note">No PTF or neighbor VM is in the dataplane path.</text>
+</svg>

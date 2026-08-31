@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="930" viewBox="0 0 1400 930" role="img" aria-labelledby="title desc">
+  <title id="title">How direct and injected T0 links are realized</title>
+  <desc id="desc">A direct host interface moves a server-facing VLAN interface into PTF. An injected neighbor link joins PTF, a neighbor VM, and the DUT-facing VLAN interface on an Open vSwitch bridge. Both cross the test server NIC and fanout VLAN tunnel to physical DUT ports.</desc>
+  <defs>
+    <marker id="green-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#059669"/></marker>
+    <marker id="purple-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7c3aed"/></marker>
+    <style>
+      .bg{fill:#fff}.server{fill:#f8fafc;stroke:#64748b;stroke-width:2}.ptf{fill:#ecfdf5;stroke:#059669;stroke-width:2}.vm{fill:#f5f3ff;stroke:#7c3aed;stroke-width:2}.ovs{fill:#fef9c3;stroke:#ca8a04;stroke-width:2}.linkbox{fill:#f1f5f9;stroke:#475569;stroke-width:2}.dut{fill:#eff6ff;stroke:#2563eb;stroke-width:2}
+      .title{font:700 30px system-ui,sans-serif;fill:#0f172a}.subtitle{font:16px system-ui,sans-serif;fill:#475569}.head{font:700 21px system-ui,sans-serif;fill:#0f172a}.label{font:600 15px system-ui,sans-serif;fill:#1e293b}.small{font:13px system-ui,sans-serif;fill:#475569}.note{font:15px system-ui,sans-serif;fill:#334155}.step{font:700 15px system-ui,sans-serif;fill:#fff}
+      .wire{fill:none;stroke:#475569;stroke-width:3}.packet{fill:none;stroke:#059669;stroke-width:4;marker-end:url(#green-arrow)}.observe{fill:none;stroke:#7c3aed;stroke-width:3;stroke-dasharray:9 7;marker-end:url(#purple-arrow)}
+    </style>
+  </defs>
+  <rect width="1400" height="930" class="bg"/>
+  <text x="40" y="45" class="title">T0 realization: direct PTF ports and injected PTF ports</text>
+  <text x="40" y="73" class="subtitle">Both are PTF interfaces, but they are wired differently and serve different logical roles.</text>
+
+  <rect x="40" y="105" width="1020" height="720" rx="14" class="server"/>
+  <text x="65" y="140" class="head">Test server</text>
+
+  <text x="70" y="190" class="head">A. Direct host interface — PTF models a downstream server</text>
+  <rect x="90" y="225" width="205" height="95" rx="9" class="ptf"/>
+  <text x="145" y="260" class="label">PTF container</text><text x="160" y="285" class="small">eth0</text><text x="112" y="306" class="small">interface moved into namespace</text>
+  <rect x="400" y="235" width="195" height="75" rx="9" class="linkbox"/>
+  <text x="426" y="266" class="label">VLAN interface</text><text x="444" y="291" class="small">p4p1.100</text>
+  <rect x="710" y="235" width="190" height="75" rx="9" class="linkbox"/>
+  <text x="753" y="266" class="label">Server NIC</text><text x="744" y="291" class="small">802.1Q trunk</text>
+  <path d="M295 272H400M595 272H710" class="packet"/>
+  <text x="314" y="254" class="small">same Linux link</text><text x="616" y="254" class="small">tag VLAN 100</text>
+
+  <line x1="70" y1="370" x2="1030" y2="370" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="70" y="415" class="head">B. Injected interface — PTF shares a neighbor-to-DUT OVS link</text>
+  <rect x="90" y="465" width="205" height="95" rx="9" class="ptf"/>
+  <text x="145" y="500" class="label">PTF container</text><text x="154" y="525" class="small">eth28</text><text x="112" y="546" class="small">one end of a veth pair</text>
+  <rect x="90" y="650" width="205" height="90" rx="9" class="vm"/>
+  <text x="136" y="684" class="label">Neighbor VM0100</text><text x="123" y="709" class="small">Ethernet1 / VM0100-t0</text>
+  <rect x="405" y="530" width="205" height="125" rx="9" class="ovs"/>
+  <text x="453" y="565" class="label">OVS bridge</text><text x="440" y="590" class="small">br-VM0100-0</text><text x="433" y="618" class="small">three attached ports</text>
+  <rect x="710" y="555" width="190" height="75" rx="9" class="linkbox"/>
+  <text x="736" y="586" class="label">VLAN interface</text><text x="752" y="611" class="small">p4p1.128</text>
+  <path d="M295 512L405 565M295 695L405 620M610 592H710" class="wire"/>
+  <text x="310" y="490" class="small">inje-vms1-1-28</text>
+  <path d="M300 505L405 555" class="packet"/><path d="M405 625L300 685" class="packet"/><path d="M610 580H710" class="packet"/>
+  <path d="M710 610H610M405 605L300 535M405 615L300 685" class="observe"/>
+  <text x="420" y="682" class="small">OVS rules: VM → DUT; DUT → VM + PTF; PTF → DUT</text>
+
+  <path d="M900 272H1090M900 592H1090" class="wire"/>
+  <rect x="1090" y="180" width="145" height="500" rx="10" class="linkbox"/>
+  <text x="1110" y="218" class="head">Physical tunnel</text>
+  <rect x="1112" y="255" width="100" height="60" rx="7" class="linkbox"/><text x="1131" y="290" class="label">Root fanout</text>
+  <rect x="1112" y="385" width="100" height="60" rx="7" class="linkbox"/><text x="1131" y="420" class="label">Leaf fanout</text>
+  <rect x="1098" y="545" width="128" height="85" rx="7" class="dut"/><text x="1146" y="578" class="label">DUT</text><text x="1117" y="602" class="small">Ethernet0 / 112</text>
+  <path d="M1162 315V385M1162 445V545" class="wire"/>
+  <text x="1222" y="350" class="small">trunk</text><text x="1222" y="498" class="small">per-port VLAN</text>
+
+  <rect x="40" y="850" width="1320" height="55" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+  <circle cx="72" cy="878" r="14" fill="#059669"/><text x="67" y="883" class="step">1</text><text x="95" y="884" class="note">Topology indices choose the link role.</text>
+  <circle cx="425" cy="878" r="14" fill="#059669"/><text x="420" y="883" class="step">2</text><text x="448" y="884" class="note">Deployment creates the Linux/OVS wiring.</text>
+  <circle cx="835" cy="878" r="14" fill="#059669"/><text x="830" y="883" class="step">3</text><text x="858" y="884" class="note">Connection-graph VLANs reach physical DUT ports.</text>
+</svg>

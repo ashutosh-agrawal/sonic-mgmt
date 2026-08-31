@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="880" viewBox="0 0 1400 880" role="img" aria-labelledby="title desc">
+  <title id="title">sonic-mgmt management plane</title>
+  <desc id="desc">The management container reaches DUTs, the test server, fanouts, console and power systems over the lab management network. The test server management bridge connects PTF and neighbor management interfaces. PTF adapter control reaches the PTF NN agent through the PTF management address. This view excludes dataplane traffic.</desc>
+  <defs>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2563eb"/></marker>
+    <marker id="orange-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#d97706"/></marker>
+    <style>
+      .bg{fill:#fff}.zone{fill:#f8fafc;stroke:#94a3b8;stroke-width:2}.mgr{fill:#eff6ff;stroke:#2563eb;stroke-width:2}.device{fill:#f1f5f9;stroke:#475569;stroke-width:2}.server{fill:#ecfdf5;stroke:#059669;stroke-width:2}.oob{fill:#fff7ed;stroke:#d97706;stroke-width:2}
+      .title{font:700 30px system-ui,sans-serif;fill:#0f172a}.subtitle{font:16px system-ui,sans-serif;fill:#475569}.head{font:700 21px system-ui,sans-serif;fill:#0f172a}.label{font:600 15px system-ui,sans-serif;fill:#1e293b}.small{font:13px system-ui,sans-serif;fill:#475569}.note{font:15px system-ui,sans-serif;fill:#334155}.buslabel{font:700 15px system-ui,sans-serif;fill:#1d4ed8}
+      .control{fill:none;stroke:#2563eb;stroke-width:3;marker-end:url(#blue-arrow)}.bus{fill:none;stroke:#2563eb;stroke-width:5}.inside{fill:none;stroke:#059669;stroke-width:3}.nn{fill:none;stroke:#2563eb;stroke-width:3;stroke-dasharray:9 7;marker-end:url(#blue-arrow)}.recover{fill:none;stroke:#d97706;stroke-width:3;marker-end:url(#orange-arrow)}
+    </style>
+  </defs>
+  <rect width="1400" height="880" class="bg"/>
+  <text x="40" y="45" class="title">Management plane: commands and observations, not test packets</text>
+  <text x="40" y="73" class="subtitle">The controlling process can be outside the lab server even when PTF and neighbors run inside that server.</text>
+
+  <rect x="60" y="115" width="340" height="150" rx="12" class="mgr"/>
+  <text x="88" y="150" class="head">Management container / host</text>
+  <text x="88" y="182" class="label">Deployment</text><text x="190" y="182" class="small">testbed-cli + Ansible</text>
+  <text x="88" y="211" class="label">Execution</text><text x="190" y="211" class="small">run_tests.sh + pytest</text>
+  <text x="88" y="240" class="small">inventory and credentials resolve endpoints</text>
+
+  <path d="M400 190H1290" class="bus"/>
+  <text x="730" y="172" class="buslabel">Lab management network</text>
+  <path d="M400 190H500" class="control"/>
+
+  <rect x="485" y="300" width="170" height="95" rx="10" class="device"/>
+  <text x="535" y="335" class="head">DUT</text><text x="514" y="362" class="small">management NIC</text><text x="507" y="382" class="small">SSH / Ansible / APIs</text>
+  <path d="M570 190V300" class="control"/>
+
+  <rect x="710" y="300" width="170" height="95" rx="10" class="device"/>
+  <text x="752" y="335" class="head">Fanout</text><text x="738" y="362" class="small">management NIC</text><text x="738" y="382" class="small">SSH / network API</text>
+  <path d="M795 190V300" class="control"/>
+
+  <rect x="935" y="300" width="180" height="95" rx="10" class="oob"/>
+  <text x="963" y="335" class="head">Console / PDU</text><text x="958" y="362" class="small">terminal or power API</text><text x="969" y="382" class="small">recovery path</text>
+  <path d="M1025 190V300" class="recover"/>
+
+  <rect x="60" y="455" width="1280" height="350" rx="14" class="zone"/>
+  <text x="85" y="490" class="head">Test server</text>
+  <rect x="95" y="525" width="210" height="90" rx="10" class="server"/>
+  <text x="138" y="560" class="label">Server management</text><text x="137" y="584" class="small">SSH + privileged host work</text><text x="149" y="604" class="small">Docker / OVS / KVM</text>
+  <path d="M1185 190V440H200V525" class="control"/>
+
+  <rect x="400" y="525" width="210" height="90" rx="10" class="server"/>
+  <text x="465" y="560" class="label">Bridge br1</text><text x="434" y="584" class="small">server/VM/PTF management</text><text x="451" y="604" class="small">subnet attachment</text>
+  <path d="M305 570H400" class="inside"/>
+
+  <rect x="705" y="515" width="230" height="110" rx="10" class="server"/>
+  <text x="770" y="550" class="label">PTF container</text><text x="757" y="575" class="small">mgmt interface + IP</text><text x="746" y="598" class="small">sshd • supervisor • NN agent</text>
+  <path d="M610 570H705" class="inside"/>
+
+  <rect x="1035" y="515" width="245" height="110" rx="10" class="server"/>
+  <text x="1081" y="550" class="label">Neighbor VM/container</text><text x="1087" y="575" class="small">Management0 / mgmt veth</text><text x="1100" y="598" class="small">NOS control access</text>
+  <path d="M610 590L1035 570" class="inside"/>
+
+  <path d="M290 265C350 380 740 390 820 515" class="nn"/>
+  <rect x="345" y="405" width="345" height="34" rx="6" fill="#fff" stroke="#bfdbfe"/>
+  <text x="360" y="428" class="buslabel">PTF adapter control: TCP to ptf_nn_agent</text>
+
+  <rect x="705" y="675" width="575" height="105" rx="9" fill="#fff" stroke="#cbd5e1"/>
+  <text x="730" y="707" class="label">Important boundary</text>
+  <text x="730" y="735" class="note">PTF management reaches agents and copies files.</text>
+  <text x="730" y="760" class="note">PTF eth0…ethN carry test packets; they are outside this view.</text>
+
+  <text x="85" y="840" class="note">A successful SSH or NN-agent connection proves management reachability only; it does not prove OVS, VLAN, fanout, or DUT dataplane wiring.</text>
+</svg>

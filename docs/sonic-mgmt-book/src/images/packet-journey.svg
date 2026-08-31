@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">Packet journey from pytest through PTF and a physical DUT</title>
+  <desc id="desc">Pytest calls the PTF adapter, which controls a remote PTF NN agent over the management network. The agent emits a packet from a PTF Linux interface. The packet crosses OVS or a VLAN interface, server NIC, optional root fanout, leaf fanout, DUT ASIC, and returns to a PTF or neighbor endpoint. The observation returns to pytest for verification.</desc>
+  <defs>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2563eb"/></marker>
+    <marker id="green-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#059669"/></marker>
+    <style>
+      .bg{fill:#fff}.zone{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2}.bluebox{fill:#eff6ff;stroke:#2563eb;stroke-width:2}.greenbox{fill:#ecfdf5;stroke:#059669;stroke-width:2}.device{fill:#f1f5f9;stroke:#475569;stroke-width:2}.dut{fill:#f5f3ff;stroke:#7c3aed;stroke-width:2}
+      .title{font:700 30px system-ui,sans-serif;fill:#0f172a}.subtitle{font:16px system-ui,sans-serif;fill:#475569}.head{font:700 21px system-ui,sans-serif;fill:#0f172a}.label{font:600 15px system-ui,sans-serif;fill:#1e293b}.small{font:13px system-ui,sans-serif;fill:#475569}.note{font:15px system-ui,sans-serif;fill:#334155}.num{font:700 15px system-ui,sans-serif;fill:#fff}
+      .blue{fill:none;stroke:#2563eb;stroke-width:4;marker-end:url(#blue-arrow)}.return{fill:none;stroke:#2563eb;stroke-width:3;stroke-dasharray:9 7;marker-end:url(#blue-arrow)}.green{fill:none;stroke:#059669;stroke-width:4;marker-end:url(#green-arrow)}
+    </style>
+  </defs>
+  <rect width="1400" height="820" class="bg"/>
+  <text x="40" y="45" class="title">One packet test crosses two paths</text>
+  <text x="40" y="73" class="subtitle">Blue is adapter control and observations over management; green is the Ethernet packet in the dataplane.</text>
+
+  <rect x="40" y="110" width="1320" height="225" rx="14" class="zone"/>
+  <text x="65" y="145" class="head">Management/control path</text>
+  <rect x="85" y="185" width="190" height="85" rx="9" class="bluebox"/><text x="130" y="217" class="label">pytest test</text><text x="107" y="242" class="small">testutils.send / verify</text>
+  <rect x="375" y="185" width="220" height="85" rx="9" class="bluebox"/><text x="417" y="217" class="label">PtfTestAdapter</text><text x="413" y="242" class="small">device + port index</text>
+  <rect x="710" y="175" width="240" height="105" rx="9" class="bluebox"/><text x="760" y="207" class="label">ptf_nn_agent</text><text x="740" y="232" class="small">inside PTF container</text><text x="742" y="256" class="small">reachable by PTF mgmt IP</text>
+  <rect x="1070" y="185" width="220" height="85" rx="9" class="bluebox"/><text x="1123" y="217" class="label">Observation</text><text x="1097" y="242" class="small">received packet / timeout</text>
+  <path d="M275 227H375M595 227H710" class="blue"/><text x="298" y="211" class="small">Python call</text><text x="615" y="211" class="small">TCP NN socket</text>
+  <path d="M1070 255C1010 315 610 315 275 255" class="return"/><text x="615" y="313" class="small">capture result returns to the assertion</text>
+
+  <rect x="40" y="365" width="1320" height="360" rx="14" class="zone"/>
+  <text x="65" y="400" class="head">Dataplane path in a physical testbed</text>
+  <rect x="70" y="485" width="140" height="80" rx="9" class="greenbox"/><text x="98" y="516" class="label">PTF ethN</text><text x="90" y="541" class="small">Linux interface</text>
+  <rect x="275" y="485" width="150" height="80" rx="9" class="greenbox"/><text x="305" y="516" class="label">OVS/VLAN</text><text x="301" y="541" class="small">logical link</text>
+  <rect x="490" y="485" width="140" height="80" rx="9" class="device"/><text x="515" y="516" class="label">Server NIC</text><text x="518" y="541" class="small">VLAN trunk</text>
+  <rect x="695" y="475" width="150" height="100" rx="9" class="device"/><text x="718" y="509" class="label">Root fanout</text><text x="728" y="534" class="small">optional</text><text x="714" y="556" class="small">allowed VLAN</text>
+  <rect x="910" y="475" width="150" height="100" rx="9" class="device"/><text x="935" y="509" class="label">Leaf fanout</text><text x="926" y="534" class="small">VLAN → cable</text><text x="947" y="556" class="small">mapping</text>
+  <rect x="1125" y="465" width="180" height="120" rx="9" class="dut"/><text x="1179" y="500" class="label">DUT ASIC</text><text x="1160" y="525" class="small">ingress pipeline</text><text x="1148" y="548" class="small">forward / transform / drop</text><text x="1170" y="571" class="small">egress port</text>
+  <path d="M210 525H275M425 525H490M630 525H695M845 525H910M1060 525H1125" class="green"/>
+  <g><circle cx="237" cy="498" r="14" fill="#059669"/><text x="232" y="503" class="num">1</text><circle cx="452" cy="498" r="14" fill="#059669"/><text x="447" y="503" class="num">2</text><circle cx="657" cy="498" r="14" fill="#059669"/><text x="652" y="503" class="num">3</text><circle cx="872" cy="498" r="14" fill="#059669"/><text x="867" y="503" class="num">4</text><circle cx="1087" cy="498" r="14" fill="#059669"/><text x="1082" y="503" class="num">5</text></g>
+  <path d="M1215 585C1110 670 310 670 140 565" class="green"/>
+  <text x="457" y="688" class="small">Expected egress returns through another mapped link to PTF or a neighbor endpoint</text>
+  <path d="M830 280V365" class="blue"/><text x="842" y="334" class="small">agent emits/captures</text>
+
+  <rect x="40" y="755" width="1320" height="45" rx="8" fill="#fff" stroke="#cbd5e1"/>
+  <text x="65" y="783" class="note">A send call confirms that the adapter reached the agent; only an end-to-end observation plus device state validates DUT behavior.</text>
+</svg>

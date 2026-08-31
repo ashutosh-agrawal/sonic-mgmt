@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="850" viewBox="0 0 1400 850" role="img" aria-labelledby="title desc">
+  <title id="title">Management, backplane, and dataplane networks in a sonic-mgmt testbed</title>
+  <desc id="desc">The management network connects the management runner to devices and the test server bridge. The isolated backplane connects ExaBGP in PTF to neighbor VMs for route distribution. The dataplane connects PTF and neighbors through OVS, VLAN tunnels, fanouts, and DUT ports.</desc>
+  <defs>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2563eb"/></marker>
+    <marker id="orange-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#d97706"/></marker>
+    <marker id="green-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#059669"/></marker>
+    <style>
+      .bg{fill:#fff}.lane{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2}.bluebox{fill:#eff6ff;stroke:#2563eb;stroke-width:2}.orangebox{fill:#fff7ed;stroke:#d97706;stroke-width:2}.greenbox{fill:#ecfdf5;stroke:#059669;stroke-width:2}.device{fill:#f1f5f9;stroke:#475569;stroke-width:2}
+      .title{font:700 30px system-ui,sans-serif;fill:#0f172a}.subtitle{font:16px system-ui,sans-serif;fill:#475569}.head{font:700 21px system-ui,sans-serif;fill:#0f172a}.lanehead{font:700 18px system-ui,sans-serif;fill:#0f172a}.label{font:600 15px system-ui,sans-serif;fill:#1e293b}.small{font:13px system-ui,sans-serif;fill:#475569}.note{font:15px system-ui,sans-serif;fill:#334155}
+      .blue{fill:none;stroke:#2563eb;stroke-width:3;marker-end:url(#blue-arrow)}.orange{fill:none;stroke:#d97706;stroke-width:3;marker-end:url(#orange-arrow)}.green{fill:none;stroke:#059669;stroke-width:4;marker-end:url(#green-arrow)}.bi{marker-start:url(#green-arrow)}
+    </style>
+  </defs>
+  <rect width="1400" height="850" class="bg"/>
+  <text x="40" y="45" class="title">Three networks coexist in the same testbed</text>
+  <text x="40" y="73" class="subtitle">They connect different interfaces, carry different traffic, and fail independently.</text>
+
+  <rect x="40" y="110" width="1320" height="205" rx="14" class="lane"/>
+  <text x="65" y="145" class="lanehead">Management network — operate components</text>
+  <rect x="85" y="185" width="190" height="75" rx="9" class="bluebox"/><text x="113" y="216" class="label">Management runner</text><text x="112" y="241" class="small">Ansible + pytest</text>
+  <rect x="355" y="185" width="160" height="75" rx="9" class="bluebox"/><text x="407" y="216" class="label">br1</text><text x="376" y="241" class="small">test server bridge</text>
+  <rect x="595" y="175" width="180" height="95" rx="9" class="bluebox"/><text x="645" y="210" class="label">PTF mgmt</text><text x="624" y="234" class="small">SSH + NN agent</text><text x="647" y="254" class="small">mgmt IP</text>
+  <rect x="855" y="175" width="180" height="95" rx="9" class="bluebox"/><text x="895" y="210" class="label">VM mgmt</text><text x="889" y="234" class="small">Management0</text><text x="882" y="254" class="small">NOS commands</text>
+  <rect x="1115" y="175" width="190" height="95" rx="9" class="bluebox"/><text x="1170" y="210" class="label">DUT mgmt</text><text x="1151" y="234" class="small">SSH / APIs</text><text x="1149" y="254" class="small">outside packet path</text>
+  <path d="M275 222H355M515 222H595M515 242L855 242M275 205C650 105 1000 105 1190 175" class="blue"/>
+
+  <rect x="40" y="340" width="1320" height="205" rx="14" class="lane"/>
+  <text x="65" y="375" class="lanehead">Backplane network — distribute routes to simulated neighbors</text>
+  <rect x="85" y="415" width="220" height="85" rx="9" class="orangebox"/><text x="131" y="447" class="label">ExaBGP in PTF</text><text x="117" y="473" class="small">announce/withdraw API</text>
+  <rect x="400" y="415" width="220" height="85" rx="9" class="orangebox"/><text x="450" y="447" class="label">br-b-&lt;group&gt;</text><text x="444" y="473" class="small">isolated bridge</text>
+  <rect x="715" y="405" width="220" height="105" rx="9" class="orangebox"/><text x="762" y="438" class="label">Neighbor VM</text><text x="755" y="463" class="small">Ethernet5/backplane</text><text x="762" y="487" class="small">learns routes</text>
+  <rect x="1030" y="405" width="255" height="105" rx="9" class="device"/><text x="1084" y="438" class="label">DUT control plane</text><text x="1065" y="463" class="small">BGP over neighbor-facing link</text><text x="1068" y="487" class="small">learns re-advertised routes</text>
+  <path d="M305 457H400M620 457H715" class="orange"/>
+  <path d="M935 457H1030" fill="none" stroke="#475569" stroke-width="3" marker-end="url(#orange-arrow)"/>
+
+  <rect x="40" y="570" width="1320" height="205" rx="14" class="lane"/>
+  <text x="65" y="605" class="lanehead">Dataplane — carry packets under test</text>
+  <rect x="85" y="650" width="170" height="75" rx="9" class="greenbox"/><text x="125" y="681" class="label">PTF ethN</text><text x="113" y="706" class="small">send / capture</text>
+  <rect x="330" y="650" width="170" height="75" rx="9" class="greenbox"/><text x="367" y="681" class="label">OVS / veth</text><text x="361" y="706" class="small">logical binding</text>
+  <rect x="575" y="650" width="170" height="75" rx="9" class="greenbox"/><text x="605" y="681" class="label">VLAN + NIC</text><text x="611" y="706" class="small">server trunk</text>
+  <rect x="820" y="650" width="170" height="75" rx="9" class="greenbox"/><text x="850" y="681" class="label">Fanout(s)</text><text x="846" y="706" class="small">VLAN-to-port map</text>
+  <rect x="1065" y="650" width="210" height="75" rx="9" class="greenbox"/><text x="1115" y="681" class="label">DUT port / ASIC</text><text x="1110" y="706" class="small">tested forwarding</text>
+  <path d="M255 687H330M500 687H575M745 687H820M990 687H1065" class="green"/>
+
+  <text x="65" y="815" class="note">Control-plane protocols such as BGP use neighbor-facing dataplane links; “control plane” describes their function, not a fourth cable network.</text>
+</svg>

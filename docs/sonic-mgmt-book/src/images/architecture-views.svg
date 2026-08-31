@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">Four complementary views of one sonic-mgmt testbed</title>
+  <desc id="desc">The physical view shows installed hardware, the logical view shows modeled network roles, the realization view shows Linux and Open vSwitch links, and the management view shows orchestration connections. All four describe the same selected testbed.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+    <style>
+      .bg{fill:#fff}.panel{fill:#f8fafc;stroke:#94a3b8;stroke-width:2}.physical{fill:#f1f5f9;stroke:#475569;stroke-width:2}.logical{fill:#f5f3ff;stroke:#7c3aed;stroke-width:2}.runtime{fill:#ecfdf5;stroke:#059669;stroke-width:2}.mgmt{fill:#eff6ff;stroke:#2563eb;stroke-width:2}
+      .title{font:700 30px system-ui,sans-serif;fill:#0f172a}.subtitle{font:16px system-ui,sans-serif;fill:#475569}.head{font:700 21px system-ui,sans-serif;fill:#0f172a}.body{font:15px system-ui,sans-serif;fill:#334155}.small{font:13px system-ui,sans-serif;fill:#475569}.label{font:600 14px system-ui,sans-serif;fill:#1e293b}
+      .line{fill:none;stroke:#475569;stroke-width:3;marker-end:url(#arrow)}.bi{fill:none;stroke:#475569;stroke-width:3}.dash{stroke-dasharray:8 7}.purple{color:#7c3aed;stroke:#7c3aed}.green{color:#059669;stroke:#059669}.blue{color:#2563eb;stroke:#2563eb}
+    </style>
+  </defs>
+  <rect width="1400" height="820" class="bg"/>
+  <text x="40" y="45" class="title">One selected testbed, four architectural views</text>
+  <text x="40" y="73" class="subtitle">Do not combine these views into one box-and-arrow diagram; each answers a different question.</text>
+
+  <rect x="40" y="105" width="640" height="315" rx="14" class="panel"/>
+  <text x="65" y="140" class="head">1. Physical — what is installed and cabled?</text>
+  <rect x="80" y="180" width="120" height="70" rx="8" class="physical"/><text x="105" y="211" class="label">Test server</text><text x="104" y="232" class="small">NIC trunk</text>
+  <rect x="260" y="180" width="120" height="70" rx="8" class="physical"/><text x="281" y="211" class="label">Root fanout</text><text x="287" y="232" class="small">optional</text>
+  <rect x="440" y="180" width="120" height="70" rx="8" class="physical"/><text x="461" y="211" class="label">Leaf fanout</text><text x="472" y="232" class="small">VLAN map</text>
+  <rect x="440" y="315" width="120" height="70" rx="8" class="physical"/><text x="475" y="347" class="label">DUT</text><text x="458" y="368" class="small">front-panel ports</text>
+  <path d="M200 215H260M380 215H440M500 250V315" class="bi"/>
+  <text x="213" y="202" class="small">802.1Q</text><text x="392" y="202" class="small">802.1Q</text><text x="510" y="289" class="small">cables</text>
+  <text x="80" y="399" class="body">Source of truth: connection graph plus the actual cabling.</text>
+
+  <rect x="720" y="105" width="640" height="315" rx="14" class="panel"/>
+  <text x="745" y="140" class="head">2. Logical — what network is being modeled?</text>
+  <rect x="790" y="175" width="145" height="60" rx="8" class="logical"/><text x="814" y="211" class="label">T1 neighbors</text>
+  <rect x="965" y="265" width="145" height="70" rx="8" class="logical"/><text x="1013" y="294" class="label">DUT</text><text x="990" y="316" class="small">T0 role</text>
+  <rect x="1140" y="175" width="145" height="60" rx="8" class="logical"/><text x="1166" y="211" class="label">PTF servers</text>
+  <path d="M935 215L986 265M1140 215L1089 265" class="line purple"/>
+  <text x="770" y="375" class="body">Source of truth: <tspan font-family="monospace">topo_*.yml</tspan> and the selected topology family.</text>
+
+  <rect x="40" y="455" width="640" height="315" rx="14" class="panel"/>
+  <text x="65" y="490" class="head">3. Realization — how are logical links built?</text>
+  <rect x="75" y="530" width="130" height="60" rx="8" class="runtime"/><text x="115" y="566" class="label">PTF</text>
+  <rect x="75" y="655" width="130" height="60" rx="8" class="runtime"/><text x="95" y="691" class="label">Neighbor VM</text>
+  <rect x="270" y="585" width="135" height="70" rx="8" class="runtime"/><text x="298" y="615" class="label">OVS bridge</text><text x="294" y="638" class="small">flow rules</text>
+  <rect x="470" y="585" width="150" height="70" rx="8" class="runtime"/><text x="489" y="615" class="label">VLAN interface</text><text x="504" y="638" class="small">server NIC</text>
+  <path d="M205 560L270 605M205 685L270 635M405 620H470" class="line green"/>
+  <text x="77" y="745" class="body">Source of truth: topology roles plus <tspan font-family="monospace">vm_set</tspan> deployment.</text>
+
+  <rect x="720" y="455" width="640" height="315" rx="14" class="panel"/>
+  <text x="745" y="490" class="head">4. Management — who controls and observes whom?</text>
+  <rect x="930" y="525" width="205" height="65" rx="8" class="mgmt"/><text x="958" y="553" class="label">Management container</text><text x="980" y="575" class="small">Ansible + pytest</text>
+  <rect x="755" y="670" width="125" height="60" rx="8" class="mgmt"/><text x="790" y="706" class="label">DUT</text>
+  <rect x="900" y="670" width="125" height="60" rx="8" class="mgmt"/><text x="917" y="706" class="label">Test server</text>
+  <rect x="1045" y="670" width="125" height="60" rx="8" class="mgmt"/><text x="1071" y="706" class="label">Fanouts</text>
+  <rect x="1190" y="670" width="125" height="60" rx="8" class="mgmt"/><text x="1212" y="706" class="label">Neighbors</text>
+  <path d="M1000 590L835 670M1020 590L965 670M1040 590L1105 670M1060 590L1250 670" class="line blue"/>
+  <text x="745" y="635" class="small">SSH • Ansible modules • network APIs • PTF NN control</text>
+  <text x="745" y="756" class="body">Source of truth: inventory, credentials, fixtures, and live reachability.</text>
+</svg>
